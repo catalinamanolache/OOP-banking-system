@@ -58,6 +58,7 @@ public class CheckCardStatus implements Command {
                     .build();
             account.addTransaction(transaction);
             card.setIsFrozen(true);
+            System.out.println("Card " + card.getCardNumber() + " has been frozen timestamp: " + timestamp);
         }
     }
 }

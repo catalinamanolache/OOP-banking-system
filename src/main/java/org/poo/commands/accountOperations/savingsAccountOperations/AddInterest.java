@@ -1,4 +1,4 @@
-package org.poo.commands.accountOperations;
+package org.poo.commands.accountOperations.savingsAccountOperations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -10,34 +10,31 @@ import org.poo.commands.Command;
 import org.poo.bankManager.Bank;
 import org.poo.transactions.Transaction;
 
-public class ChangeInterestRate implements Command {
+public class AddInterest implements Command {
     private CommandData command;
     private Bank bank;
     private ArrayNode output;
 
-    public ChangeInterestRate(final CommandData command, final Bank bank, final ArrayNode output) {
+    public AddInterest(final CommandData command, final Bank bank, final ArrayNode output) {
         this.command = command;
         this.bank = bank;
         this.output = output;
     }
 
     /**
-     * Execute the changeInterestRate command.
+     * Executes the addInterest command.
      */
     @Override
     public void execute() {
         String iban = this.command.getAccount();
         int timestamp = this.command.getTimestamp();
-        double interestRate = this.command.getInterestRate();
 
-        // get the account by iban
         Account account = this.bank.getAccountByIban(iban);
 
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode result = objectMapper.createObjectNode();
         result.put("command", this.command.getCommand());
 
-        // if the account is not a savings account, print an error
         if (account.getAccountType().equals("classic")) {
             ObjectNode outputNode = objectMapper.createObjectNode();
             outputNode.put("timestamp", timestamp);
@@ -48,15 +45,15 @@ public class ChangeInterestRate implements Command {
             return;
         }
 
-        // change the interest rate of the account
         SavingsAccount savingsAccount = (SavingsAccount) account;
-        savingsAccount.setInterestRate(interestRate);
+        double toAdd = account.getBalance() * savingsAccount.getInterestRate();
+        account.deposit(toAdd);
 
-        // add a successful transaction to the account
         Transaction transaction;
         transaction = new Transaction.TransactionBuilder(timestamp,
-                "Interest rate of the account changed to " + interestRate,
-                this.command.getCommand())
+                "Interest rate income", this.command.getCommand())
+                .currency(account.getCurrency())
+                .amount(toAdd)
                 .build();
         account.addTransaction(transaction);
     }

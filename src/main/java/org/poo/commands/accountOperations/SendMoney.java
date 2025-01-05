@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.commands.Command;
+import org.poo.commands.accountOperations.cashbackInstances.CashbackContext;
 import org.poo.instances.*;
 import org.poo.transactions.Transaction;
 import org.poo.bankManager.Bank;
@@ -38,17 +39,32 @@ public class SendMoney implements Command {
 //        System.out.println("context " + this.bank.getSplitPaymentContext().getParticipants());
 
         // get the sender and receiver accounts
-        Account senderAccount = this.bank.getAccountByIban(senderIban);
-        Account receiverAccount = this.bank.getAccountByIban(receiverIban);
+        Account senderAccount;
+        Account receiverAccount;
+        Map<String, String> aliasMap = this.bank.getAliasMap();
 
-        if (senderAccount == null || receiverAccount == null) {
-            // if the accounts are not found, check if the sender or receiver is an alias
-            Map<String, String> aliasMap = this.bank.getAliasMap();
+        // check if the sender and receiver are aliases and get the real account
+        if (this.bank.getAccountByIban(senderIban) == null) {
             senderAccount = this.bank.getAccountByIban(aliasMap.get(senderIban));
-            receiverAccount = this.bank.getAccountByIban(aliasMap.get(receiverIban));
+        } else {
+            senderAccount = this.bank.getAccountByIban(senderIban);
+        }
 
-            // if the accounts are still not found, print an error and return
-            if (senderAccount == null || receiverAccount == null) {
+        if (this.bank.getAccountByIban(receiverIban) == null) {
+            receiverAccount = this.bank.getAccountByIban(aliasMap.get(receiverIban));
+        } else {
+            receiverAccount = this.bank.getAccountByIban(receiverIban);
+        }
+
+//        System.out.println("receiver iban " + receiverIban + " receiver account " + receiverAccount + " currency " + receiverAccount.getCurrency());
+//        System.out.println("sender iban " + senderIban + " sender account " + senderAccount + " currency " + senderAccount.getCurrency());
+        // if the accounts are still not found, try to find the receiver in the commerciants list
+        if (senderAccount == null || receiverAccount == null) {
+            // if the receiver belongs to the commerciants list, do not consider it as a real account
+            Commerciant receiverCommerciant = this.bank.getCommerciantByIban(receiverIban);
+
+            // if the receiver is still not found, print an error message
+            if (receiverCommerciant == null) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 ObjectNode resultNode = objectMapper.createObjectNode();
 
@@ -65,34 +81,49 @@ public class SendMoney implements Command {
             }
         }
 
-        // convert the amount to the receiver's currency
-        double convertedAmount =
-                CurrencyConverter.convert(senderAccount.getCurrency(),
-                        receiverAccount.getCurrency(), amount);
+        double convertedAmount;
+        if (receiverAccount != null) {
+            // convert the amount to the receiver's currency
+            convertedAmount = CurrencyConverter.convert(senderAccount.getCurrency(),
+                            receiverAccount.getCurrency(), amount);
+        } else {
+            // if the receiver is a commerciant, the amount is in the sender's currency
+            convertedAmount = amount;
+        }
+
+        // compute the commission depending on the sender user's plan
+        User senderUser = this.bank.getUserByEmail(email);
+        double commission;
+        if (senderAccount.getAccountType().equals(Account.AccountType.BUSINESS)) {
+            commission = Plan.getCommission(senderAccount.getOwner().getPlanType(), amount,
+                    senderAccount.getCurrency());
+        } else {
+            commission = Plan.getCommission(senderUser.getPlanType(), amount,
+                    senderAccount.getCurrency());
+        }
 
         // check if the sender has enough funds and if not, add an error transaction to the sender
-        if (senderAccount.getBalance() < amount) {
+        if (senderAccount.getBalance() < amount + commission) {
             Transaction transactionSender;
             transactionSender = new Transaction.TransactionBuilder(timestamp,
                     "Insufficient funds", this.command.getCommand())
                     .build();
             senderAccount.addTransaction(transactionSender);
         } else {
-            // take the commission depending on the sender user's plan
-            User senderUser = this.bank.getUserByEmail(email);
-            double commission = Plan.getCommission(senderUser.getPlanType(), amount,
-                    senderAccount.getCurrency());
-
-            // withdraw the amount from the sender and deposit it to the receiver
+            // withdraw the amount and the commision from the sender and deposit it to the receiver
             senderAccount.withdraw(amount + commission);
-            receiverAccount.deposit(convertedAmount);
+
+            // only deposit if the receiver is not a commerciant
+            if (receiverAccount != null) {
+                receiverAccount.deposit(convertedAmount);
+            }
 
 //            System.out.print(this.command.getCommand() + " | took commission " + commission + " for email " + email +
 //                    " timestamp " + timestamp);
 //            System.out.print(" | new balance " + senderAccount.getBalance() + "\n");
-            System.out.println("timestamp " +timestamp  + "  "+ email + " sent " + amount + " " + senderAccount.getCurrency() +
-                    " to " + receiverAccount.getOwner()  + " and paid a commission of " + commission + " " +
-                    senderAccount.getCurrency());
+//            System.out.println("timestamp " +timestamp  + "  "+ email + " sent " + amount + " " + senderAccount.getCurrency() +
+//                    " to " + receiverAccount.getOwner().getEmail() + " in currency " + receiverAccount.getCurrency()+ " and paid a commission of " + commission + " " +
+//                    senderAccount.getCurrency() + " sender plan " + senderUser.getPlanType());
 
             // TODO:Pentru sendMoney cand destinatarul este un comerciant, se va lua currency-ul contului din care se face plata.
             Commerciant commerciant = this.bank.getCommerciantByIban(receiverIban);
@@ -114,6 +145,14 @@ public class SendMoney implements Command {
 
                 // get the cashback benefit for spending threshold
                 cashbackContext.useCashback(senderUser, senderAccount, commerciant, convertedAmount);
+
+                senderAccount.handleMoneyTransactions(senderUser, -convertedAmount, commerciant);
+
+                // check if the user can upgrade its plan from silver to gold automatically
+                // TODO:  Tranzactiile mai mari de 300 RON incep sa se contorizeze abia cand planul utilizatorului este silver
+                if (senderUser.getPlanType().equals(Plan.PlanType.SILVER)) {
+                    Plan.checkIfCanUpgrade(senderUser);
+                }
             }
 
             // add the transactions to the sender and receiver
@@ -128,16 +167,18 @@ public class SendMoney implements Command {
                     .build();
             senderAccount.addTransaction(transactionSender);
 
-            Transaction transactionReceiver;
-            transactionReceiver = new Transaction.TransactionBuilder(timestamp, description,
-                    this.command.getCommand())
-                    .senderIBAN(senderIban)
-                    .receiverIBAN(receiverIban)
-                    .amount(convertedAmount)
-                    .currency(receiverAccount.getCurrency())
-                    .transferType("received")
-                    .build();
-            receiverAccount.addTransaction(transactionReceiver);
+            if (receiverAccount != null) {
+                Transaction transactionReceiver;
+                transactionReceiver = new Transaction.TransactionBuilder(timestamp, description,
+                        this.command.getCommand())
+                        .senderIBAN(senderIban)
+                        .receiverIBAN(receiverIban)
+                        .amount(convertedAmount)
+                        .currency(receiverAccount.getCurrency())
+                        .transferType("received")
+                        .build();
+                receiverAccount.addTransaction(transactionReceiver);
+            }
         }
     }
 }

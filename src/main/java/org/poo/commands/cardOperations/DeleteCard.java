@@ -27,11 +27,11 @@ public class DeleteCard implements Command {
         String cardNumber = this.command.getCardNumber();
         int timestamp = this.command.getTimestamp();
 
-        // get the owner of the card and the card to delete
-        User owner = this.bank.getUserByEmail(email);
+        // get the user who tries to delete the card and the card to delete
+        User user = this.bank.getUserByEmail(email);
         Card cardToDelete = this.bank.getCardByCardNumber(cardNumber);
 
-        if (cardToDelete == null || owner == null) {
+        if (cardToDelete == null || user == null) {
             return;
         }
 
@@ -41,12 +41,17 @@ public class DeleteCard implements Command {
         // get the iban of the parent account
         String iban = cardToDelete.getParentAccount().getIban();
 
+        if (!account.handleCardTransactions(cardToDelete, user)) {
+            System.out.println("You are not authorized to make this transaction in delete card.");
+            return;
+        }
+
         // create a transaction for the deletion of the card
         Transaction transaction;
         transaction = new Transaction.TransactionBuilder(timestamp,
                 "The card has been destroyed", this.command.getCommand())
                 .card(cardNumber)
-                .cardHolder(owner.getEmail())
+                .cardHolder(user.getEmail())
                 .card(cardNumber)
                 .account(iban)
                 .build();

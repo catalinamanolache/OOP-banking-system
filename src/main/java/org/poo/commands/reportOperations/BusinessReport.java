@@ -11,8 +11,7 @@ import org.poo.instances.CommandData;
 import org.poo.instances.Commerciant;
 import org.poo.instances.User;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BusinessReport implements Command {
     private CommandData command;
@@ -61,10 +60,20 @@ public class BusinessReport implements Command {
 
         ObjectNode report = objectMapper.createObjectNode();
         report.put("IBAN", iban);
-        report.put("balance", balance);
+
+        String formattedBalance = String.format("%.2f", balance);
+        double newBalance = Double.parseDouble(formattedBalance);
+        report.put("balance", newBalance);
+
         report.put("currency", currency);
-        report.put("spending limit", spendingLimit);
-        report.put("deposit limit", depositLimit);
+
+        String formattedSpendingLimit = String.format("%.2f", spendingLimit);
+        double newSpendingLimit = Double.parseDouble(formattedSpendingLimit);
+        report.put("spending limit", newSpendingLimit);
+
+        String formattedDepositLimit = String.format("%.2f", depositLimit);
+        double newDepositLimit = Double.parseDouble(formattedDepositLimit);
+        report.put("deposit limit", newDepositLimit);
 
 
         if (type.equals("transaction")) {
@@ -81,10 +90,17 @@ public class BusinessReport implements Command {
                 totalSpent += spentByManager;
                 totalDeposited += depositedByManager;
 
-                managerNode.put("username", manager.getFirstName()
-                        + " " + manager.getLastName());
-                managerNode.put("spent", spentByManager);
-                managerNode.put("deposited", depositedByManager);
+                managerNode.put("username", manager.getLastName()
+                        + " " + manager.getFirstName());
+
+                String formattedSpentByManager = String.format("%.2f", spentByManager);
+                double newSpentByManager = Double.parseDouble(formattedSpentByManager);
+                managerNode.put("spent", newSpentByManager);
+
+
+                String formattedDepositedByManager = String.format("%.2f", depositedByManager);
+                double newDepositedByManager = Double.parseDouble(formattedDepositedByManager);
+                managerNode.put("deposited", newDepositedByManager);
                 managersArray.add(managerNode);
             }
             report.set("managers", managersArray);
@@ -97,9 +113,17 @@ public class BusinessReport implements Command {
                 totalSpent += spentByEmployee;
                 totalDeposited += depositedByEmployee;
 
-                employeeNode.put("username", employee.getFirstName() + " " + employee.getLastName());
-                employeeNode.put("spent", spentByEmployee);
-                employeeNode.put("deposited", depositedByEmployee);
+                employeeNode.put("username", employee.getLastName() + " "
+                        + employee.getFirstName());
+
+                String formattedSpentByEmployee = String.format("%.2f", spentByEmployee);
+                double newSpentByEmployee = Double.parseDouble(formattedSpentByEmployee);
+                employeeNode.put("spent", newSpentByEmployee);
+
+
+                String formattedDepositedByEmployee = String.format("%.2f", depositedByEmployee);
+                double newDepositedByEmployee = Double.parseDouble(formattedDepositedByEmployee);
+                employeeNode.put("deposited", newDepositedByEmployee);
                 employeesArray.add(employeeNode);
             }
             report.set("employees", employeesArray);
@@ -111,26 +135,47 @@ public class BusinessReport implements Command {
             ArrayNode commerciantsArray = objectMapper.createArrayNode();
             Map<Commerciant, Double> totalSpentAtCommerciantMap
                     = businessAccount.getTotalSpentAtCommerciantsMap();
-            for (Map.Entry<Commerciant, Double> entry : totalSpentAtCommerciantMap.entrySet()) {
+            Map<Commerciant, Double> sortedCommerciantsMap
+                    = new TreeMap<>(Comparator.comparing(Commerciant::getCommerciant));
+            sortedCommerciantsMap.putAll(totalSpentAtCommerciantMap);
+
+            for (Map.Entry<Commerciant, Double> entry : sortedCommerciantsMap.entrySet()) {
                 ObjectNode commerciantNode = objectMapper.createObjectNode();
                 Commerciant commerciant = entry.getKey();
                 List<User> usersWhoSpentAtCommerciant =
                         businessAccount.getUsersWhoSpentAtCommerciant(commerciant);
                 double totalSpentAtCommerciant = entry.getValue();
-
+                System.out.println("total spent at commerciant: " + totalSpentAtCommerciant + " commerciant name: " + commerciant.getCommerciant() + " users who spent: " + usersWhoSpentAtCommerciant);
                 commerciantNode.put("commerciant", commerciant.getCommerciant());
-                commerciantNode.put("totalReceived", totalSpentAtCommerciant);
+
+                String formattedTotalReceived = String.format("%.2f", totalSpentAtCommerciant);
+                double newTotalReceived = Double.parseDouble(formattedTotalReceived);
+                commerciantNode.put("total received", newTotalReceived);
 
                 ArrayNode managersArray = objectMapper.createArrayNode();
                 ArrayNode employeesArray = objectMapper.createArrayNode();
+                TreeSet<String> sortedEmployees = new TreeSet<>();
+                TreeSet<String> sortedManagers = new TreeSet<>();
 
                 for (User user : usersWhoSpentAtCommerciant) {
                     BusinessAccount.UserType userType = businessAccount.getUserType(user);
-                    if (userType.equals(BusinessAccount.UserType.EMPLOYEE)) {
-                        employeesArray.add(user.getFirstName() + " " + user.getLastName());
-                    } else {
-                        managersArray.add(user.getFirstName() + " " + user.getLastName());
+                    if (userType == null) {
+                        continue;
                     }
+                    String name = user.getLastName() + " " + user.getFirstName();
+                    if (userType.equals(BusinessAccount.UserType.EMPLOYEE)) {
+                       sortedEmployees.add(name);
+                    } else {
+                        sortedManagers.add(name);
+                    }
+                }
+
+                for (String employee : sortedEmployees) {
+                    employeesArray.add(employee);
+                }
+
+                for (String manager : sortedManagers) {
+                    managersArray.add(manager);
                 }
 
                 commerciantNode.set("managers", managersArray);
@@ -139,6 +184,7 @@ public class BusinessReport implements Command {
                 commerciantsArray.add(commerciantNode);
             }
             report.set("commerciants", commerciantsArray);
+            report.put("statistics type", "commerciant");
         }
         output.set("output", report);
         this.output.add(output);

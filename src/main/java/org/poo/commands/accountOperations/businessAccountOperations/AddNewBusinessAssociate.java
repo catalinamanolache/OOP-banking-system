@@ -1,4 +1,4 @@
-package org.poo.commands.accountOperations;
+package org.poo.commands.accountOperations.businessAccountOperations;
 
 import org.poo.accounts.Account;
 import org.poo.accounts.BusinessAccount;

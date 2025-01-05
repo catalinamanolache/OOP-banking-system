@@ -1,10 +1,11 @@
-package org.poo.commands.accountOperations;
+package org.poo.commands.accountOperations.businessAccountOperations;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.accounts.BusinessAccount;
 import org.poo.bankManager.Bank;
-import org.poo.bankManager.CurrencyConverter;
 import org.poo.commands.Command;
 import org.poo.instances.CommandData;
 import org.poo.instances.User;
@@ -24,7 +25,7 @@ public class ChangeDepositLimit implements Command {
     public void execute() {
         String email = this.command.getEmail();
         String iban = this.command.getAccount();
-        double depositLimit = this.command.getDepositLimit();
+        double depositLimit = this.command.getAmount();
         int timestamp = this.command.getTimestamp();
 
         Account account = this.bank.getAccountByIban(iban);
@@ -39,8 +40,26 @@ public class ChangeDepositLimit implements Command {
             return;
         }
 
+        ObjectMapper objectMapper = new ObjectMapper();
+
         if (!account.getAccountType().equals(Account.AccountType.BUSINESS)) {
             System.out.println("not a business account in change deposit limit.");
+            return;
+        }
+
+        if (!account.getOwner().getEmail().equals(email)) {
+            ObjectNode resultNode = objectMapper.createObjectNode();
+            resultNode.put("command", this.command.getCommand());
+
+            ObjectNode outputNode = objectMapper.createObjectNode();
+
+            outputNode.put("description",
+                    "You must be owner in order to change deposit limit.");
+            outputNode.put("timestamp", timestamp);
+            resultNode.put("timestamp", timestamp);
+            resultNode.set("output", outputNode);
+            this.output.add(resultNode);
+            System.out.println("user " + email + " is not owenr of account " + iban + " the owner is " + account.getOwner().getEmail());
             return;
         }
 
@@ -54,5 +73,6 @@ public class ChangeDepositLimit implements Command {
 //        double convertedDepositLimit = CurrencyConverter.convert("RON",
 //                businessAccount.getCurrency(), depositLimit);
         businessAccount.setDepositLimit(depositLimit);
+        System.out.println("Deposit limit changed successfully to " + depositLimit + " timestamp: " + timestamp);
     }
 }

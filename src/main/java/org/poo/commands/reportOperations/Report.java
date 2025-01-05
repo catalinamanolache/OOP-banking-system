@@ -51,7 +51,11 @@ public class Report implements Command {
         }
 
         outputNode.put("IBAN", account.getIban());
-        outputNode.put("balance", account.getBalance());
+
+        String formattedBalance = String.format("%.2f", account.getBalance());
+        Double newBalance = Double.parseDouble(formattedBalance);
+        outputNode.put("balance", newBalance);
+
         outputNode.put("currency", account.getCurrency());
 
         // create the transactions array and populate it with the transactions

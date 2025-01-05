@@ -1,7 +1,6 @@
 package org.poo.instances;
 
 import org.poo.fileio.CommerciantInput;
-import java.util.List;
 
 public final class Commerciant {
     private String commerciant;
@@ -26,7 +25,7 @@ public final class Commerciant {
         return commerciant;
     }
 
-    public void setCommerciant(String commerciant) {
+    public void setCommerciant(final String commerciant) {
         this.commerciant = commerciant;
     }
 
@@ -34,7 +33,7 @@ public final class Commerciant {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
@@ -42,7 +41,7 @@ public final class Commerciant {
         return account;
     }
 
-    public void setAccount(String account) {
+    public void setAccount(final String account) {
         this.account = account;
     }
 
@@ -50,7 +49,7 @@ public final class Commerciant {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -58,7 +57,7 @@ public final class Commerciant {
         return cashbackStrategy;
     }
 
-    public void setCashbackStrategy(String cashbackStrategy) {
+    public void setCashbackStrategy(final String cashbackStrategy) {
         this.cashbackStrategy = cashbackStrategy;
     }
 }

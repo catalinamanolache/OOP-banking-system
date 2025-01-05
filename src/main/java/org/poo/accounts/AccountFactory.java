@@ -1,6 +1,5 @@
 package org.poo.accounts;
 
-import org.poo.instances.Plan;
 import org.poo.instances.User;
 
 public final class AccountFactory {
@@ -16,15 +15,12 @@ public final class AccountFactory {
      * @return the account created
      */
     public static Account createAccount(final String type, final String currency,
-                                        final double interestRate, final User owner){
-        if (type.equals("classic")) {
-            return new ClassicAccount(currency, owner);
-        } else if (type.equals("savings")) {
-            return new SavingsAccount(currency, interestRate, owner);
-        } else if (type.equals("business")) {
-            return new BusinessAccount(currency, owner);
-        } else {
-            return null;
-        }
+                                        final double interestRate, final User owner) {
+        return switch (type) {
+            case "classic" -> new ClassicAccount(currency, owner);
+            case "savings" -> new SavingsAccount(currency, interestRate, owner);
+            case "business" -> new BusinessAccount(currency, owner);
+            default -> null;
+        };
     }
 }

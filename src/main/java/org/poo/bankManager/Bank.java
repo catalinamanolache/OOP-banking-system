@@ -64,7 +64,12 @@ public final class Bank {
         ProccessCommands.processCommands(commandInputs, this, output);
     }
 
-    public Commerciant getCommerciantByIban(String iban) {
+    /**
+     * Gets the commerciant with the given IBAN.
+     * @param iban the IBAN
+     * @return the commerciant with the given IBAN
+     */
+    public Commerciant getCommerciantByIban(final String iban) {
         for (Commerciant commerciant : this.commerciants) {
             if (commerciant.getAccount().equals(iban)) {
                 return commerciant;
@@ -74,13 +79,20 @@ public final class Bank {
         return null;
     }
 
-    public Commerciant getCommerciantByName(String name) {
+    /**
+     * Get the commerciant with the given name.
+     * @param name the name
+     * @return the commerciant with the given name
+     */
+    public Commerciant getCommerciantByName(final String name) {
         for (Commerciant commerciant : this.commerciants) {
-            if (commerciant.getCommerciant().equals(name)) {
+            // the given commerciant can be its name or its id, so we check both
+            if (commerciant.getCommerciant().equals(name)
+                    || (name.matches("-?\\d+(\\.\\d+)?")
+                    && commerciant.getId() == Integer.parseInt(name))) {
                 return commerciant;
             }
         }
-
         return null;
     }
 
@@ -154,17 +166,21 @@ public final class Bank {
         return null;
     }
 
+    /**
+     * Creates a split payment context based on the given parameters.
+     * @param participants the participants in the split payment
+     * @param currency the currency of the split payment
+     * @param amountForUsers the amount each user has to pay
+     * @param amount the total amount
+     * @param type the type of the split payment
+     * @param timestamp the timestamp when the split payment was initiated
+     */
     public void createSplitPaymentContext(final List<String> participants, final String currency,
                                           final List<Double> amountForUsers, final double amount,
                                           final String type, final int timestamp) {
-        SplitPaymentContext context = new SplitPaymentContext(participants, currency, amountForUsers,
-                amount, type, timestamp, this);
+        SplitPaymentContext context = new SplitPaymentContext(participants, currency,
+                amountForUsers, amount, type, timestamp, this);
         this.splitPaymentContextMap.put(timestamp, context);
-        System.out.println("split payment context created " + timestamp);
-    }
-
-    public void getSplitPaymentContext(final int timestamp) {
-        this.splitPaymentContextMap.get(timestamp);
     }
 
     public Map<String, String> getAliasMap() {
@@ -203,7 +219,7 @@ public final class Bank {
         return splitPaymentContextMap;
     }
 
-    public void setSplitPaymentContextMap(Map<Integer, SplitPaymentContext> splitPaymentContextMap) {
-        this.splitPaymentContextMap = splitPaymentContextMap;
+    public void setSplitPaymentContextMap(final Map<Integer, SplitPaymentContext> map) {
+        this.splitPaymentContextMap = map;
     }
 }

@@ -43,7 +43,9 @@ final class FormatTransactions {
         if (!transaction.getDescription().equals("Insufficient funds")) {
             transactionNode.put("senderIBAN", transaction.getSenderIBAN());
             transactionNode.put("receiverIBAN", transaction.getReceiverIBAN());
-            transactionNode.put("amount", transaction.getAmount() + " "
+            String amount = String.format("%.2f", transaction.getAmount());
+            Double newAmount = Double.parseDouble(amount);
+            transactionNode.put("amount", newAmount + " "
                     + transaction.getCurrency());
             transactionNode.put("transferType", transaction.getTransferType());
         }
@@ -94,7 +96,10 @@ final class FormatTransactions {
         ObjectNode transactionNode = OBJECT_MAPPER.createObjectNode();
 
         if (transaction.getAmount() != 0.0 && transaction.getCommerciant() != null) {
-            transactionNode.put("amount", transaction.getAmount());
+            String formattedAmount = String.format("%.2f", transaction.getAmount());
+            Double newFormattedAmount = Double.parseDouble(formattedAmount);
+            transactionNode.put("amount", newFormattedAmount);
+
             transactionNode.put("commerciant", transaction.getCommerciant());
         }
         transactionNode.put("description", transaction.getDescription());
@@ -130,7 +135,6 @@ final class FormatTransactions {
         transactionNode.put("currency", transaction.getCurrency());
         transactionNode.put("splitPaymentType", transaction.getSplitPaymentType());
 
-//        transactionNode.put("amount", transaction.getAmount());
 
         ArrayNode accountsArray = OBJECT_MAPPER.createArrayNode();
 
@@ -139,14 +143,18 @@ final class FormatTransactions {
         }
         transactionNode.set("involvedAccounts", accountsArray);
 
-
         ArrayNode amountForUsersArray = OBJECT_MAPPER.createArrayNode();
-        if (transaction.getAmountForUsers() != null) {
+        if (transaction.getSplitPaymentType().equals("custom")) {
             for (Double amount : transaction.getAmountForUsers()) {
                 amountForUsersArray.add(amount);
             }
             transactionNode.set("amountForUsers", amountForUsersArray);
+        }
 
+        if (transaction.getSplitPaymentType().equals("equal")) {
+            String formattedAmount = String.format("%.2f", transaction.getAmount());
+            Double newFormattedAmount = Double.parseDouble(formattedAmount);
+            transactionNode.put("amount", newFormattedAmount);
         }
 
         if (transaction.getError() != null) {
@@ -252,7 +260,10 @@ final class FormatTransactions {
         transactionNode.put("timestamp", transaction.getTimestamp());
         transactionNode.put("description", transaction.getDescription());
 
-        transactionNode.put("amount", transaction.getAmount());
+        String formattedAmount = String.format("%.2f", transaction.getAmount());
+        Double newFormattedAmount = Double.parseDouble(formattedAmount);
+        transactionNode.put("amount", newFormattedAmount);
+
         transactionNode.put("currency", transaction.getCurrency());
         return transactionNode;
     }
@@ -365,7 +376,6 @@ public final class PrintTransactionsJSON {
                 }
             }
         }
-        //TODO: am deja un map totalSpent in cont!!
 
         // print the transactions in JSON format
         printTransactions(transactionsRange, transactionArray);

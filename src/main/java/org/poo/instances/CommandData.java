@@ -210,7 +210,7 @@ public final class CommandData {
         return newPlanType;
     }
 
-    public void setNewPlanType(String newPlanType) {
+    public void setNewPlanType(final String newPlanType) {
         this.newPlanType = newPlanType;
     }
 
@@ -218,7 +218,7 @@ public final class CommandData {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(final String role) {
         this.role = role;
     }
 
@@ -226,7 +226,7 @@ public final class CommandData {
         return splitPaymentType;
     }
 
-    public void setSplitPaymentType(String splitPaymentType) {
+    public void setSplitPaymentType(final String splitPaymentType) {
         this.splitPaymentType = splitPaymentType;
     }
 
@@ -234,7 +234,7 @@ public final class CommandData {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -242,7 +242,7 @@ public final class CommandData {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(final String location) {
         this.location = location;
     }
 
@@ -250,7 +250,7 @@ public final class CommandData {
         return spendingLimit;
     }
 
-    public void setSpendingLimit(double spendingLimit) {
+    public void setSpendingLimit(final double spendingLimit) {
         this.spendingLimit = spendingLimit;
     }
 
@@ -258,7 +258,7 @@ public final class CommandData {
         return depositLimit;
     }
 
-    public void setDepositLimit(double depositLimit) {
+    public void setDepositLimit(final double depositLimit) {
         this.depositLimit = depositLimit;
     }
 
@@ -266,7 +266,7 @@ public final class CommandData {
         return amountForUsers;
     }
 
-    public void setAmountForUsers(List<Double> amountForUsers) {
+    public void setAmountForUsers(final List<Double> amountForUsers) {
         this.amountForUsers = amountForUsers;
     }
 }

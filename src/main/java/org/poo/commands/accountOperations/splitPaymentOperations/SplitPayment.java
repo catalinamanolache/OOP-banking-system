@@ -1,12 +1,9 @@
-package org.poo.commands.accountOperations;
+package org.poo.commands.accountOperations.splitPaymentOperations;
 
 import org.poo.accounts.Account;
-import org.poo.bankManager.SplitPaymentContext;
 import org.poo.instances.CommandData;
 import org.poo.commands.Command;
 import org.poo.bankManager.Bank;
-import org.poo.bankManager.CurrencyConverter;
-import org.poo.transactions.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +32,8 @@ public class SplitPayment implements Command {
 
         // check if all accounts have enough funds for the split payment
         int accountsNumber = accountIbans.size();
-        boolean failed = false;
-        String accountFailed = null;
+//        boolean failed = false;
+//        String accountFailed = null;
 
         if (amountForUsers == null) {
             amountForUsers = new ArrayList<>();
@@ -44,58 +41,67 @@ public class SplitPayment implements Command {
                 amountForUsers.add(amount / accountsNumber);
             }
         }
-
-        for (int i = 0; i < accountsNumber; i++) {
-            Account account = this.bank.getAccountByIban(accountIbans.get(i));
+        System.out.println("new split payment of type "+ type +" between " + accountIbans + " amount "
+                + amount + " currency " + currency + " timestamp " + timestamp);
+        System.out.print("owners are ");
+        for (String iban : accountIbans) {
+            Account account = this.bank.getAccountByIban(iban);
             if (account == null) {
-                System.out.println("account at position " + i + " is null in finding if it has enough funds");
-                // TODO : “One of the accounts is invalid.” →
-                //  cand unul dintre conturile date in lista de conturi pentru split este invalid
+                System.out.println("account is null in split payment");
                 continue;
             }
-
-            // convert the amount to the account's currency
-            double amountConverted = CurrencyConverter.convert(currency, account.getCurrency(),
-                    amountForUsers.get(i));
-            System.out.println("user " + account.getOwner() +  " with account " + account.getIban() +" balance in currency " + currency + " is " +
-                    CurrencyConverter.convert(account.getCurrency(), currency, account.getBalance()) + " balance in account currency " + account.getBalance() + " " + account.getCurrency());
-
-            // check if the account has enough funds and get the first account that failed
-            if (account.getBalance() < amountConverted) {
-                failed = true;
-                accountFailed = accountIbans.get(i);
-                break;
-            }
+            System.out.print(account.getOwner().getEmail() + " ");
         }
+        System.out.println();
 
-        // if the payment failed, add the failed transaction to each account
-        if (failed) {
-            System.out.println("failed split payment at timestamp " + timestamp);
-            for (int i = 0; i < accountsNumber; i++) {
-                Account accountInvolved = this.bank.getAccountByIban(accountIbans.get(i));
-                if (accountInvolved == null) {
-                    System.out.println("account at position " + i + " is null in printing failed transaction");
-                    // TODO : “One of the accounts is invalid.” →
-                    //  cand unul dintre conturile date in lista de conturi pentru split este invalid
-                    continue;
-                }
-                String formattedAmount = String.format("%.2f", amount);
-
-                Transaction transaction;
-                transaction = new Transaction.TransactionBuilder(timestamp,
-                        "Split payment of " + formattedAmount + " " + currency,
-                        this.command.getCommand())
-                        .currency(currency)
-                        .amount(amountForUsers.get(i))
-                        .involvedAccounts(accountIbans)
-                        .splitPaymentType(type)
-                        .error("Account " + accountFailed
-                                + " has insufficient funds for a split payment.")
-                        .build();
-                accountInvolved.addTransaction(transaction);
-            }
-            return;
-        }
+//        for (int i = 0; i < accountsNumber; i++) {
+//            Account account = this.bank.getAccountByIban(accountIbans.get(i));
+//            if (account == null) {
+//                continue;
+//            }
+//
+//            // convert the amount to the account's currency
+//            double amountConverted = CurrencyConverter.convert(currency, account.getCurrency(),
+//                    amountForUsers.get(i));
+//
+//
+//            // check if the account has enough funds and get the first account that failed
+//            if (account.getBalance() < amountConverted) {
+//                failed = true;
+//                accountFailed = accountIbans.get(i);
+//                break;
+//            }
+//        }
+//
+//        // if the payment failed, add the failed transaction to each account
+//        if (failed) {
+//            System.out.println("failed split payment at timestamp " + timestamp);
+//            for (int i = 0; i < accountsNumber; i++) {
+//                Account accountInvolved = this.bank.getAccountByIban(accountIbans.get(i));
+//                if (accountInvolved == null) {
+//                    System.out.println("account at position " + i + " is null in printing failed transaction");
+//                    // TODO : “One of the accounts is invalid.” →
+//                    //  cand unul dintre conturile date in lista de conturi pentru split este invalid
+//                    continue;
+//                }
+//                String formattedAmount = String.format("%.2f", amount);
+//
+//                Transaction transaction;
+//                transaction = new Transaction.TransactionBuilder(timestamp,
+//                        "Split payment of " + formattedAmount + " " + currency,
+//                        this.command.getCommand())
+//                        .currency(currency)
+//                        .amount(amountForUsers.get(i))
+//                        .involvedAccounts(accountIbans)
+//                        .splitPaymentType(type)
+//                        .amountForUsers(amountForUsers)
+//                        .error("Account " + accountFailed
+//                                + " has insufficient funds for a split payment.")
+//                        .build();
+//                accountInvolved.addTransaction(transaction);
+//            }
+//            return;
+//        }
 
 //        SplitPaymentContext splitPaymentContext = new SplitPaymentContext(accountIbans, currency,
 //                amountForUsers, amount, type, timestamp);

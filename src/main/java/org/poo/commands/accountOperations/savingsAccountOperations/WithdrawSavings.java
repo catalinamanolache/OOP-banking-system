@@ -1,4 +1,4 @@
-package org.poo.commands.accountOperations;
+package org.poo.commands.accountOperations.savingsAccountOperations;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.poo.accounts.Account;
@@ -63,14 +63,14 @@ public class WithdrawSavings implements Command {
                     .error("minimum age")
                     .build();
             account.addTransaction(transaction);
-            System.out.println("You don't have the minimum age required.");
+            System.out.println("minimum age error " + account.getIban() + " " + user.getEmail() + " " + user.getAge());
             return;
         }
 
         Account toDepositAccount = null;
 
         for (Account userAccount : user.getAccounts()) {
-            if (userAccount.getAccountType().equals("savings")
+            if (userAccount.getAccountType().equals(Account.AccountType.CLASSIC)
                     && userAccount.getCurrency().equals(currency)) {
                 toDepositAccount = userAccount;
                 break;
@@ -86,20 +86,19 @@ public class WithdrawSavings implements Command {
                     .error("classic account not found")
                     .build();
             account.addTransaction(transaction);
-            System.out.println("You don't have a classic account.");
+            System.out.println("classic account not found " + account.getIban() + " " + user.getEmail());
             return;
         }
 
-        // TODO: add commission to amountToDeposit
         double amountToDeposit = CurrencyConverter.convert(currency,
                 toDepositAccount.getCurrency(), amount);
 
         // TODO: check with minBalance?
-        if (toDepositAccount.getBalance() < amountToDeposit) {
+        if (account.getBalance() < amountToDeposit) {
             // TODO: transaction or output "Insufficient funds."
             Transaction transaction;
             transaction = new Transaction.TransactionBuilder(timestamp,
-                    "Insufficient funds.",
+                    "Insufficient funds",
                     this.command.getCommand())
                     .error("insufficient funds")
                     .build();
@@ -114,12 +113,14 @@ public class WithdrawSavings implements Command {
         // TODO: transaction or output "Savings withdrawal."
         Transaction transaction;
         transaction = new Transaction.TransactionBuilder(timestamp,
-                "Savings withdrawal.",
+                "Savings withdrawal",
                 this.command.getCommand())
                 .classicAccountIBAN(toDepositAccount.getIban())
                 .savingsAccountIBAN(account.getIban())
+                .amount(amount)
                 .build();
         account.addTransaction(transaction);
+        toDepositAccount.addTransaction(transaction);
         System.out.println("Savings withdrawal.");
 //        System.out.println("Did not implement WithdrawSavings");
     }

@@ -52,7 +52,7 @@ public class SpendingsReport implements Command {
         }
 
         // if the account is a saving account, print an error message
-        if (account.getAccountType().equals("savings")) {
+        if (account.getAccountType().equals(Account.AccountType.SAVINGS)) {
             outputNode.put("error", "This kind of report is not supported for a saving account");
             result.set("output", outputNode);
             result.put("timestamp", timestamp);

@@ -1,6 +1,9 @@
-package org.poo.instances;
+package org.poo.commands.accountOperations.cashbackInstances;
 
 import org.poo.accounts.Account;
+import org.poo.instances.Commerciant;
+import org.poo.instances.Plan;
+import org.poo.instances.User;
 
 import java.util.Map;
 

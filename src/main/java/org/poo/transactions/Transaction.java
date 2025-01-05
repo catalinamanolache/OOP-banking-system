@@ -21,7 +21,7 @@ public final class Transaction {
     private String savingsAccountIBAN;
     private String newPlanType;
     private List<Double> amountForUsers;
-    String splitPaymentType;
+    private String splitPaymentType;
 
     private Transaction(final TransactionBuilder builder) {
         this.timestamp = builder.timestamp;
@@ -185,31 +185,31 @@ public final class Transaction {
 
         /**
          * Builds a transaction with the given classicAccountIBAN.
-         * @param classicAccountIBAN the classicAccountIBAN of the transaction
+         * @param classicAccountIBANString the classicAccountIBAN of the transaction
          * @return the transaction builder
          */
-        public TransactionBuilder classicAccountIBAN(final String classicAccountIBAN) {
-            this.classicAccountIBAN = classicAccountIBAN;
+        public TransactionBuilder classicAccountIBAN(final String classicAccountIBANString) {
+            this.classicAccountIBAN = classicAccountIBANString;
             return this;
         }
 
         /**
          * Builds a transaction with the given savingsAccountIBAN.
-         * @param savingsAccountIBAN the savingsAccountIBAN of the transaction
+         * @param savingsAccountIBANString the savingsAccountIBAN of the transaction
          * @return the transaction builder
          */
-        public TransactionBuilder savingsAccountIBAN(final String savingsAccountIBAN) {
-            this.savingsAccountIBAN = savingsAccountIBAN;
+        public TransactionBuilder savingsAccountIBAN(final String savingsAccountIBANString) {
+            this.savingsAccountIBAN = savingsAccountIBANString;
             return this;
         }
 
         /**
          * Builds a transaction with the given newPlanType.
-         * @param newPlanType the newPlanType of the transaction
+         * @param newPlanTypeString the newPlanType of the transaction
          * @return the transaction builder
          */
-        public TransactionBuilder newPlanType(final String newPlanType) {
-            this.newPlanType = newPlanType;
+        public TransactionBuilder newPlanType(final String newPlanTypeString) {
+            this.newPlanType = newPlanTypeString;
             return this;
         }
 
@@ -225,11 +225,11 @@ public final class Transaction {
 
         /**
          * Builds a transaction with the given splitPaymentType.
-         * @param splitPaymentType the splitPaymentType of the transaction
+         * @param splitPaymentTypeString the splitPaymentType of the transaction
          * @return the transaction builder
          */
-        public TransactionBuilder splitPaymentType(final String splitPaymentType) {
-            this.splitPaymentType = splitPaymentType;
+        public TransactionBuilder splitPaymentType(final String splitPaymentTypeString) {
+            this.splitPaymentType = splitPaymentTypeString;
             return this;
         }
 
@@ -382,7 +382,7 @@ public final class Transaction {
         return amountForUsers;
     }
 
-    public void setAmountForUsers(List<Double> amountForUsers) {
+    public void setAmountForUsers(final List<Double> amountForUsers) {
         this.amountForUsers = amountForUsers;
     }
 
@@ -390,7 +390,7 @@ public final class Transaction {
         return splitPaymentType;
     }
 
-    public void setSplitPaymentType(String splitPaymentType) {
+    public void setSplitPaymentType(final String splitPaymentType) {
         this.splitPaymentType = splitPaymentType;
     }
 }

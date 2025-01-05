@@ -1,8 +1,9 @@
-package org.poo.instances;
+package org.poo.commands.accountOperations.cashbackInstances;
 
 import org.poo.accounts.Account;
+import org.poo.instances.Commerciant;
+import org.poo.instances.User;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class CashbackContext {
@@ -35,10 +36,10 @@ public class CashbackContext {
             if (entry.getKey().equals(Commerciant.CommerciantType.valueOf(commerciant.getType()))) {
                 double cashback = entry.getValue();
                 account.getNrOfTransactionsCashback().remove(entry.getKey());
-//                System.out.println("balance before " + account.getBalance());
+                System.out.println("will get discount for " +commerciant.getType() + " balance before " + account.getBalance());
                 account.deposit(amount * cashback);
-//                System.out.println("Deposited " + amount * cashback + account.getCurrency() + " user " + user.getEmail());
-//                System.out.println("Balance after " + account.getBalance());
+                System.out.println("Deposited " + amount * cashback + account.getCurrency() + " user " + user.getEmail());
+                System.out.println("Balance after and before commision " + account.getBalance());
                 break;
             }
         }
@@ -62,10 +63,10 @@ public class CashbackContext {
         double cashback = account.getSpendingThresholdCashback();
         if (cashback > 0) {
             account.setSpendingThresholdCashback(0);
-//            System.out.println("balance before " + account.getBalance());
+            System.out.println("discount spending treshold balance before " + account.getBalance());
             account.deposit(amount * cashback);
             System.out.println("Deposited " + amount * cashback + account.getCurrency() + " user " + user.getEmail());
-//            System.out.println("Balance " + account.getBalance());
+            System.out.println("Balance after and before commision " + account.getBalance());
         }
     }
 }

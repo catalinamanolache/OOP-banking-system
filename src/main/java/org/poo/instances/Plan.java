@@ -4,7 +4,16 @@ import org.poo.accounts.Account;
 import org.poo.bankManager.CurrencyConverter;
 import org.poo.transactions.Transaction;
 
-public class Plan {
+import static org.poo.instances.Constants.SILVER_THRESHOLD;
+import static org.poo.instances.Constants.SILVER_COMMISSION;
+import static org.poo.instances.Constants.STANDARD_COMMISSION;
+import static org.poo.instances.Constants.STANDARD_TO_GOLD_FEE;
+import static org.poo.instances.Constants.STANDARD_TO_SILVER_FEE;
+import static org.poo.instances.Constants.SILVER_TO_GOLD_FEE;
+import static org.poo.instances.Constants.AUTO_UPGRADE_THRESHOLD;
+import static org.poo.instances.Constants.AUTO_UPGRADE_NUMBER;
+
+public final class Plan {
     public enum PlanType {
         STUDENT, STANDARD, SILVER, GOLD
     }
@@ -12,39 +21,59 @@ public class Plan {
     private Plan() {
     }
 
+    /**
+     * Calculates the commission for a transaction based on the plan type of the user.
+     * @param planType the plan type of the user
+     * @param amount the amount of the transaction
+     * @param currency the currency of the transaction
+     * @return the commission for the transaction
+     */
     public static double getCommission(final PlanType planType, final double amount,
                                        final String currency) {
         if (planType.equals(PlanType.STANDARD)) {
-            return amount * 0.2 / 100;
+            return amount * STANDARD_COMMISSION;
         } else if (planType.equals(PlanType.SILVER)) {
+            // check if the amount is greater than the threshold in RON
             double amountConverted = CurrencyConverter.convert(currency, "RON", amount);
-            if (amountConverted >= 500) {
-                return amount * 0.1 / 100;
+            if (amountConverted >= SILVER_THRESHOLD) {
+                return amount * SILVER_COMMISSION;
             }
         }
+
+        // for STUDENT and GOLD plans
         return 0;
     }
 
+    /**
+     * Returns the fee for upgrading from a plan type to another.
+     * @param fromPlanType the plan type to upgrade from
+     * @param toPlanType the plan type to upgrade to
+     * @return the fee for upgrading from the fromPlanType to the toPlanType
+     */
     public static double getPlanFee(final PlanType fromPlanType, final PlanType toPlanType) {
         if (fromPlanType.equals(PlanType.STUDENT) || fromPlanType.equals(PlanType.STANDARD)) {
             if (toPlanType.equals(PlanType.SILVER)) {
-                return 100;
+                return STANDARD_TO_SILVER_FEE;
             } else if (toPlanType.equals(PlanType.GOLD)) {
-                return 350;
+                return STANDARD_TO_GOLD_FEE;
             }
         } else {
             if (toPlanType.equals(PlanType.GOLD)) {
-                return 250;
+                return SILVER_TO_GOLD_FEE;
             }
         }
         return -1;
     }
 
-    public static void checkIfCanUpgrade(User user) {
-        // TODO: Utilizatorul nu trebuie să plăteasca neapărat fee-ul pentru upgrade de la silver
-        //  la gold întrucât se va face upgrade automat dacă userul face 5 plăți de cel putin
-        //  300RON fiecare. !!! adica in payOnline
+    /**
+     * Checks if a user can upgrade automatically from silver to gold
+     * based on the transactions made.
+     * @param user the user to check if can upgrade
+     */
+    public static void checkIfCanUpgrade(final User user) {
         int validTransactionsCount = 0;
+
+        // count the number of transactions that are greater than 300 RON
         for (Account userAccount : user.getAccounts()) {
             for (Transaction transaction : userAccount.getTransactions()) {
                 if (transaction.getTransactionType().equals("payOnline")) {
@@ -52,11 +81,12 @@ public class Plan {
                     double amountConverted = CurrencyConverter.convert(userAccount.getCurrency(),
                             "RON", amount);
 
-                    if (amountConverted >= 300) {
+                    if (amountConverted >= AUTO_UPGRADE_THRESHOLD) {
                         validTransactionsCount++;
                     }
 
-                    if (validTransactionsCount >= 5) {
+                    // if the user has at least 5 transactions greater than 300 RON, he can upgrade
+                    if (validTransactionsCount >= AUTO_UPGRADE_NUMBER) {
                         user.setPlanType(PlanType.GOLD);
                         break;
                     }

@@ -46,8 +46,34 @@ public abstract class Account {
         this.spendingThresholdCashback = 0;
     }
 
-    public void handleTransactions(final User user, final double amount, final Commerciant commerciant) {
+    /**
+     * Round the balance to 2 decimal places.
+     */
+    public void roundBalance() {
+        String balanceString = String.format("%.2f", this.balance);
+        this.balance = Double.parseDouble(balanceString);
+    }
 
+    /**
+     * Handle money transactions between the user and a commerciant.
+     * @param user the user making the transaction
+     * @param amount the amount of the transaction
+     * @param commerciant the commerciant receiving the transaction
+     * @return true if the transaction was successful, false otherwise
+     */
+    public boolean handleMoneyTransactions(final User user, final double amount,
+                                           final Commerciant commerciant) {
+        return true;
+    }
+
+    /**
+     * Handle card transactions between the user and a card.
+     * @param card the card used for the transaction
+     * @param user the user making the transaction
+     * @return true if the transaction was successful, false otherwise
+     */
+    public boolean handleCardTransactions(final Card card, final User user) {
+        return true;
     }
 
     /**
@@ -55,27 +81,30 @@ public abstract class Account {
      * @param commerciant the commerciant to update the total spent for
      * @param amount the amount to add to the total spent
      */
-    public void updateTotalSpent(Commerciant commerciant, double amount, String currency) {
-        double amountConverted = CurrencyConverter.convert(currency, "RON", amount);
+    public void updateTotalSpent(final Commerciant commerciant, final double amount,
+                                 final String currencyString) {
+        double amountConverted = CurrencyConverter.convert(currencyString, "RON", amount);
         if (this.totalSpent.containsKey(commerciant)) {
             double newAmount = this.totalSpent.get(commerciant) + amountConverted;
             this.totalSpent.put(commerciant, newAmount);
         } else {
             this.totalSpent.put(commerciant, amountConverted);
         }
+        System.out.println("total spent " + this.totalSpent.get(commerciant));
     }
 
     /**
      * Update the number of transactions made at a given commerciant.
      * @param commerciant the commerciant to update the number of transactions for
      */
-    public void updateNrOfTransactions(Commerciant commerciant) {
+    public void updateNrOfTransactions(final Commerciant commerciant) {
         if (this.nrOfTransactions.containsKey(commerciant)) {
             int newNumber = this.nrOfTransactions.get(commerciant) + 1;
             this.nrOfTransactions.put(commerciant, newNumber);
         } else {
             this.nrOfTransactions.put(commerciant, 1);
         }
+        System.out.println("nr of transactions " + this.nrOfTransactions.get(commerciant));
     }
 
     /**
@@ -84,6 +113,7 @@ public abstract class Account {
      */
     public void deposit(final double amount) {
         balance += amount;
+        roundBalance();
     }
 
     /**
@@ -92,6 +122,7 @@ public abstract class Account {
      */
     public void withdraw(final double amount) {
         balance -= amount;
+        roundBalance();
     }
 
     /**
@@ -222,43 +253,83 @@ public abstract class Account {
         this.iban = iban;
     }
 
+    /**
+     * Getter for accountType
+     * @return the account type
+     */
     public AccountType getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(AccountType accountType) {
+    /**
+     * Setter for accountType
+     * @param accountType the account type
+     */
+    public void setAccountType(final AccountType accountType) {
         this.accountType = accountType;
     }
 
+    /**
+     * Getter for totalSpent
+     * @return the total spent at each commerciant
+     */
     public Map<Commerciant, Double> getTotalSpent() {
         return totalSpent;
     }
 
-    public void setTotalSpent(Map<Commerciant, Double> totalSpent) {
+    /**
+     * Setter for totalSpent
+     * @param totalSpent the total spent at each commerciant
+     */
+    public void setTotalSpent(final Map<Commerciant, Double> totalSpent) {
         this.totalSpent = totalSpent;
     }
 
+    /**
+     * Getter for nrOfTransactions
+     * @return the number of transactions at each commerciant
+     */
     public Map<Commerciant, Integer> getNrOfTransactions() {
         return nrOfTransactions;
     }
 
-    public void setNrOfTransactions(Map<Commerciant, Integer> nrOfTransactions) {
+    /**
+     * Setter for nrOfTransactions
+     * @param nrOfTransactions the number of transactions at each commerciant
+     */
+    public void setNrOfTransactions(final Map<Commerciant, Integer> nrOfTransactions) {
         this.nrOfTransactions = nrOfTransactions;
     }
 
+    /**
+     * Getter for nrOfTransactionsCashback
+     * @return the number of transactions cashback
+     */
     public Map<Commerciant.CommerciantType, Double> getNrOfTransactionsCashback() {
         return nrOfTransactionsCashback;
     }
 
-    public void setNrOfTransactionsCashback(Map<Commerciant.CommerciantType, Double> nrOfTransactionsCashback) {
-        this.nrOfTransactionsCashback = nrOfTransactionsCashback;
+    /**
+     * Setter for nrOfTransactionsCashback
+     * @param map the number of transactions cashback
+     */
+    public void setNrOfTransactionsCashback(final Map<Commerciant.CommerciantType, Double> map) {
+        this.nrOfTransactionsCashback = map;
     }
 
+    /**
+     * Getter for spendingThresholdCashback
+     * @return the spending threshold cashback
+     */
     public double getSpendingThresholdCashback() {
         return spendingThresholdCashback;
     }
 
-    public void setSpendingThresholdCashback(double spendingThresholdCashback) {
+    /**
+     * Setter for spendingThresholdCashback
+     * @param spendingThresholdCashback the spending threshold cashback
+     */
+    public void setSpendingThresholdCashback(final double spendingThresholdCashback) {
         this.spendingThresholdCashback = spendingThresholdCashback;
     }
 }
