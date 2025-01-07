@@ -66,6 +66,16 @@ public final class Plan {
     }
 
     /**
+     * Checks if a user tries to downgrade his plan.
+     * @param currentPlan the current plan of the user
+     * @param newPlan the new plan the user wants to upgrade to
+     * @return true if the user tries to downgrade, false otherwise
+     */
+    public static boolean checkIfDowngrade(Plan.PlanType currentPlan, Plan.PlanType newPlan) {
+        return currentPlan.compareTo(newPlan) > 0;
+    }
+
+    /**
      * Checks if a user can upgrade automatically from silver to gold
      * based on the transactions made.
      * @param user the user to check if can upgrade
@@ -73,10 +83,15 @@ public final class Plan {
     public static void checkIfCanUpgrade(final User user) {
         int validTransactionsCount = 0;
 
+        if (!user.getPlanType().equals(PlanType.SILVER)) {
+            return;
+        }
+
         // count the number of transactions that are greater than 300 RON
         for (Account userAccount : user.getAccounts()) {
             for (Transaction transaction : userAccount.getTransactions()) {
-                if (transaction.getTransactionType().equals("payOnline")) {
+                if (transaction.getTransactionType().equals("payOnline")
+                        || transaction.getTransactionType().equals("sendMoney")) {
                     double amount = transaction.getAmount();
                     double amountConverted = CurrencyConverter.convert(userAccount.getCurrency(),
                             "RON", amount);

@@ -35,11 +35,11 @@ public class AddFunds implements Command {
 
 
         if (!account.handleMoneyTransactions(user, amount, null)) {
-            System.out.println("cant deposit " + amount + " in " + iban + " by " + user.getEmail() + " timestamp: " + this.command.getTimestamp());
+//            System.out.println("cant deposit " + amount + " in " + iban + " by " + user.getEmail() + " timestamp: " + this.command.getTimestamp());
             return;
         }
 
         account.deposit(amount);
-        System.out.println("deposit " + amount + " in " + iban + " by " + user.getEmail() + " timestamp: " + this.command.getTimestamp());
+//        System.out.println("deposit " + amount + " in " + iban + " by " + user.getEmail() + " timestamp: " + this.command.getTimestamp());
         }
     }

@@ -29,7 +29,7 @@ public abstract class Account {
     private Map<Commerciant, Double> totalSpent;
     private Map<Commerciant, Integer> nrOfTransactions;
     private Map<Commerciant.CommerciantType, Double> nrOfTransactionsCashback;
-    private double spendingThresholdCashback;
+    private Map<Commerciant, Double> spendingThresholdCashback;
 
     public Account(final String currency, final AccountType accountType, final User owner) {
         this.balance = 0;
@@ -43,7 +43,7 @@ public abstract class Account {
         this.totalSpent = new HashMap<>();
         this.nrOfTransactions = new HashMap<>();
         this.nrOfTransactionsCashback = new HashMap<>();
-        this.spendingThresholdCashback = 0;
+        this.spendingThresholdCashback = new HashMap<>();
     }
 
     /**
@@ -83,6 +83,7 @@ public abstract class Account {
      */
     public void updateTotalSpent(final Commerciant commerciant, final double amount,
                                  final String currencyString) {
+//        System.out.println("commerciant " + commerciant.getCommerciant());
         double amountConverted = CurrencyConverter.convert(currencyString, "RON", amount);
         if (this.totalSpent.containsKey(commerciant)) {
             double newAmount = this.totalSpent.get(commerciant) + amountConverted;
@@ -90,7 +91,7 @@ public abstract class Account {
         } else {
             this.totalSpent.put(commerciant, amountConverted);
         }
-        System.out.println("total spent " + this.totalSpent.get(commerciant));
+//        System.out.println("total spent " + this.totalSpent.get(commerciant));
     }
 
     /**
@@ -321,15 +322,15 @@ public abstract class Account {
      * Getter for spendingThresholdCashback
      * @return the spending threshold cashback
      */
-    public double getSpendingThresholdCashback() {
+    public Map<Commerciant, Double> getSpendingThresholdCashback() {
         return spendingThresholdCashback;
     }
 
     /**
      * Setter for spendingThresholdCashback
-     * @param spendingThresholdCashback the spending threshold cashback
+     * @param map the spending threshold cashback
      */
-    public void setSpendingThresholdCashback(final double spendingThresholdCashback) {
-        this.spendingThresholdCashback = spendingThresholdCashback;
+    public void setSpendingThresholdCashback(final Map<Commerciant, Double> map) {
+        this.spendingThresholdCashback = map;
     }
 }

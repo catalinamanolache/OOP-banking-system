@@ -12,5 +12,5 @@ public final class Constants {
     public static final int AUTO_UPGRADE_THRESHOLD = 300;
     public static final int AUTO_UPGRADE_NUMBER = 5;
     public static final int INITIAL_BUSINESS_LIMIT = 500;
-
+    public static final int SAVINGS_AGE_LIMIT = 21;
 }

@@ -27,8 +27,6 @@ public class SetMinimumBalance implements Command {
         if (account != null) {
             account.setMinBalance(amount);
         }
-
-
     }
 }
 

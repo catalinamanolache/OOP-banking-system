@@ -34,15 +34,9 @@ public class DeleteAccount implements Command {
         User owner = this.bank.getUserByEmail(email);
         Account toDelete = this.bank.getAccountByIban(iban);
 
-        System.out.println(email + " 's accounts:");
-        for (Account account : owner.getAccounts()) {
-            System.out.print(account.getIban() + " ");
-        }
-        System.out.println();
+       // if this is a business account and you are not the owner of the account, return
         if (toDelete != null && toDelete.getAccountType().equals(Account.AccountType.BUSINESS)
                 && !toDelete.getOwner().getEmail().equals(email)) {
-            // TODO: “You are not authorized to make this transaction.”
-            System.out.println("You are not authorized to make this transaction in delete account");
             return;
         }
 
@@ -61,8 +55,6 @@ public class DeleteAccount implements Command {
             deleteNode.put("error",
                     "Account couldn't be deleted - see org.poo.transactions for details");
             if (toDelete != null) {
-                System.out.println("account is classic "+ toDelete.getAccountType().equals(Account.AccountType.CLASSIC));
-
                 // if the account exists but has funds, add an error transaction
                 Transaction transaction;
                 transaction = new Transaction.TransactionBuilder(timestamp,

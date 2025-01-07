@@ -31,13 +31,6 @@ public class CreateCard implements Command {
 
         // get the account by iban
         Account account = this.bank.getAccountByIban(iban);
-//
-//        if (account.getAccountType().equals(Account.AccountType.BUSINESS)
-//                && !account.getOwner().getEmail().equals(email)) {
-//            // TODO: “You are not authorized to make this transaction.”
-//            System.out.println("You are not authorized to make this transaction in create card.");
-//            return;
-//        }
 
         if (account != null) {
             // create a new card

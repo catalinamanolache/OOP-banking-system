@@ -75,11 +75,29 @@ public final class Main {
 
         ArrayNode output = objectMapper.createArrayNode();
 
+        /*
+         * TODO Implement your function here
+         *
+         * How to add output to the output array?
+         * There are multiple ways to do this, here is one example:
+         *
+         * ObjectMapper mapper = new ObjectMapper();
+         *
+         * ObjectNode objectNode = mapper.createObjectNode();
+         * objectNode.put("field_name", "field_value");
+         *
+         * ArrayNode arrayNode = mapper.createArrayNode();
+         * arrayNode.add(objectNode);
+         *
+         * output.add(arrayNode);
+         * output.add(objectNode);
+         *
+         */
+
         Bank bank = new Bank(inputData.getUsers(), inputData.getExchangeRates(),
                 inputData.getCommerciants());
         bank.setCurrencyExchange();
         bank.processCommands(inputData.getCommands(), output);
-
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePath2), output);
     }

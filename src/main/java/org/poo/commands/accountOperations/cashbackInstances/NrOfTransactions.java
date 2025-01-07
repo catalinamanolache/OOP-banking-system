@@ -7,11 +7,15 @@ import org.poo.instances.User;
 import java.util.Map;
 
 public class NrOfTransactions implements CashbackStrategy {
+    /**
+     * Calculate the number of transactions cashback for a user.
+     * @param account the account
+     * @param user the user
+     * @param commerciant the commerciant at which the user is paying
+     */
     @Override
-    public double calculateCashback(Account account, User user, Commerciant commerciant) {
-        double cashback = 0;
-//        System.out.println("FutureCashback strategy: Number of transactions");
-
+    public void calculateCashback(final Account account, final User user,
+                                  final Commerciant commerciant) {
         Map<Commerciant.CommerciantType, Double> cashbackMap =
                 account.getNrOfTransactionsCashback();
 
@@ -19,9 +23,10 @@ public class NrOfTransactions implements CashbackStrategy {
 //            return -1;
 //        }
 
+        // get how many transactions the user has made at the current commerciant
         int nrOfTransactions = account.getNrOfTransactions().get(commerciant);
 
-        // TODO: Odată ce un cashback a fost primit, nu contează de la care comerciant, nu se va mai primi a2a oară.
+        // for each number of transactions, set the cashback percentage for the commerciant
         if (nrOfTransactions == 2) {
             cashbackMap.put(Commerciant.CommerciantType.Food, 0.002);
             System.out.println("will get cashback for food");
@@ -32,8 +37,5 @@ public class NrOfTransactions implements CashbackStrategy {
             cashbackMap.put(Commerciant.CommerciantType.Tech, 0.01);
             System.out.println("will get cashback for tech");
         }
-        System.out.println(user.getEmail() + " nr of transactions: " + nrOfTransactions + " at " + commerciant.getCommerciant());
-//        System.out.println(" | future cashback: " + cashbackMap.get(Commerciant.CommerciantType.Food));
-        return cashback;
     }
 }

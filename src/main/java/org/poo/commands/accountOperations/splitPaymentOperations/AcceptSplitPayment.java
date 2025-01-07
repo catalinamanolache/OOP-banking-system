@@ -29,38 +29,31 @@ public class AcceptSplitPayment implements Command {
         this.output = output;
     }
 
+    /**
+     * Execute the acceptSplitPayment command.
+     */
     @Override
     public void execute() {
-//        System.out.println("Executing command " + this.command.getCommand() + " timestamp " + this.command.getTimestamp());
         String email = this.command.getEmail();
         int timestamp = this.command.getTimestamp();
         String type = this.command.getSplitPaymentType();
         Map<Integer, SplitPaymentContext> splitPaymentContextMap =
                 new TreeMap<>(this.bank.getSplitPaymentContextMap());
 
-//        for (Map.Entry<Integer, SplitPaymentContext> contextEntry : splitPaymentContextMap.entrySet()) {
-//            Map<String, List<String>> participantsMap = contextEntry.getValue().getParticipantsMap();
-//            for (Map.Entry<String, List<String>> participantEntry : participantsMap.entrySet()) {
-//                SplitPaymentContext.SplitPaymentType splitPaymentType =
-//                        SplitPaymentContext.SplitPaymentType.valueOf(type.toUpperCase());
-//                if (participantEntry.getKey().equals(email)
-//                        && contextEntry.getValue().getType().equals(splitPaymentType)) {
-//                    this.context = contextEntry.getValue();
-//                    break;
-//                }
-//            }
-//        }
-        for (Map.Entry<Integer, SplitPaymentContext> contextEntry : splitPaymentContextMap.entrySet()) {
-            SplitPaymentContext context = contextEntry.getValue();
-            if (context.getParticipantsMap().containsKey(email)
-                    && context.getType().toString().equalsIgnoreCase(type)) {
-                this.context = context;
+        // find the split payment context of the given type that the user is involved in
+        for (Map.Entry<Integer, SplitPaymentContext> contextEntry
+                : splitPaymentContextMap.entrySet()) {
+            SplitPaymentContext currContext = contextEntry.getValue();
+            if (currContext.getParticipantsMap().containsKey(email)
+                    && currContext.getType().toString().equalsIgnoreCase(type)) {
+                this.context = currContext;
                 break;
             }
         }
 
         User user = this.bank.getUserByEmail(email);
 
+        // if the user is not found, add an error message to the output
         if (user == null) {
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode resultNode = objectMapper.createObjectNode();
@@ -72,32 +65,30 @@ public class AcceptSplitPayment implements Command {
             resultNode.put("timestamp", timestamp);
             resultNode.set("output", outputNode);
             this.output.add(resultNode);
-            System.out.println("User not found in accept split payment timestamp " + timestamp);
             return;
         }
 
         if (this.context == null) {
-            System.out.println("context is null in accept split payment timestamp " + timestamp);
             return;
         }
 
+        // only accept the split payment if the user has not refused it yet
         if (!this.context.isRefused()) {
+            // mark the participant as accepted
             this.context.acceptParticipant(email);
-//            System.out.println(" participants " + this.context.getParticipantsIbanList());
-            System.out.print(" participant " + email + " accepted the payment " + type + " timestamp " + timestamp + " for payment originated at timestamp " + this.context.getStartedTimestamp());
-            System.out.print(" participants left to accept " + this.context.getParticipantsLeftToAccept() + "\n");
-            if (this.context.getParticipantsLeftToAccept() == 0) {
-//                System.out.println("all participants accepted the payment timestamp " + timestamp);
-                this.context.setRefused(false);
-                this.context.setRefusedBy(null);
 
+            // if all participants have accepted the split payment, execute it
+            if (this.context.getParticipantsLeftToAccept() == 0) {
+                this.context.setRefused(false);
+
+                // get the split's payment details
                 List<String> participants = new ArrayList<>(this.context.getParticipantsIbanList());
                 int accountsNumber = participants.size();
-//                System.out.println("participants number " + accountsNumber);
                 String currency = this.context.getCurrency();
                 double amount = this.context.getAmount();
                 List<Double> amountForUsers = new ArrayList<>(this.context.getAmountForUsers());
                 int startedTimestamp = this.context.getStartedTimestamp();
+                String paymentType = this.context.getType().toString().toLowerCase();
 
                 // check if all accounts have enough funds for the split payment
                 boolean failed = false;
@@ -106,33 +97,16 @@ public class AcceptSplitPayment implements Command {
                 // remove the current split payment context from the bank
                 this.bank.getSplitPaymentContextMap().remove(this.context.getStartedTimestamp());
 
+                // check if all accounts have enough funds for the split payment
                 for (int i = 0; i < accountsNumber; i++) {
                     Account account = this.bank.getAccountByIban(participants.get(i));
                     if (account == null) {
-                        System.out.println("account at position " + i + " is null in printing split payment");
-                        // TODO : “One of the accounts is invalid.” →
-                        //  cand unul dintre conturile date in lista de conturi pentru split este invalid
-                        continue;
-                    }
-                    double amountConverted = CurrencyConverter.convert(currency, account.getCurrency(),
-                            amountForUsers.get(i));
-                    System.out.println("user " + account.getOwner().getEmail() +  " with account " + account.getIban() +" balance in currency " + currency + " is " +
-                            CurrencyConverter.convert(account.getCurrency(), currency, account.getBalance()) + " balance in account currency " + account.getBalance() + " " + account.getCurrency() + " has to pay " + amountConverted + " " + currency);
-//            System.out.print("account " + accountIbans.get(i) + " " + " owner " + account.getOwner().getEmail() + " ");
-                }
-                System.out.println();
-
-                for (int i = 0; i < accountsNumber; i++) {
-                    Account account = this.bank.getAccountByIban(participants.get(i));
-                    if (account == null) {
-                        System.out.println("account at position " + i + " is null in checking split payment");
                         continue;
                     }
 
                     // convert the amount to the account's currency
-                    double amountConverted = CurrencyConverter.convert(currency, account.getCurrency(),
-                            amountForUsers.get(i));
-
+                    double amountConverted = CurrencyConverter.convert(currency,
+                            account.getCurrency(), amountForUsers.get(i));
 
                     // check if the account has enough funds and get the first account that failed
                     if (account.getBalance() < amountConverted) {
@@ -144,25 +118,21 @@ public class AcceptSplitPayment implements Command {
 
                 // if the payment failed, add the failed transaction to each account
                 if (failed) {
-                    System.out.println("failed split payment at timestamp " + timestamp + " because of account " + accountFailed);
                     for (int i = 0; i < accountsNumber; i++) {
                         Account accountInvolved = this.bank.getAccountByIban(participants.get(i));
                         if (accountInvolved == null) {
-                            System.out.println("account at position " + i + " is null in printing failed transaction");
-                            // TODO : “One of the accounts is invalid.” →
-                            //  cand unul dintre conturile date in lista de conturi pentru split este invalid
                             continue;
                         }
                         String formattedAmount = String.format("%.2f", amount);
 
                         Transaction transaction;
-                        transaction = new Transaction.TransactionBuilder(this.context.getStartedTimestamp(),
+                        transaction = new Transaction.TransactionBuilder(startedTimestamp,
                                 "Split payment of " + formattedAmount + " " + currency,
                                 "splitPayment")
                                 .currency(currency)
                                 .amount(amountForUsers.get(i))
                                 .involvedAccounts(participants)
-                                .splitPaymentType(this.context.getType().toString().toLowerCase())
+                                .splitPaymentType(paymentType)
                                 .amountForUsers(amountForUsers)
                                 .error("Account " + accountFailed
                                         + " has insufficient funds for a split payment.")
@@ -177,7 +147,6 @@ public class AcceptSplitPayment implements Command {
                     Account account = this.bank.getAccountByIban(participants.get(i));
 
                     if (account == null) {
-                        System.out.println("account at position " + i + " is null in printing successful transaction");
                         continue;
                     }
 
@@ -194,7 +163,7 @@ public class AcceptSplitPayment implements Command {
                             "Split payment of " + formattedAmount + " " + currency,
                             "splitPayment")
                             .currency(currency)
-                            .splitPaymentType(this.context.getType().toString().toLowerCase())
+                            .splitPaymentType(paymentType)
                             .amount(amountForUsers.get(i))
                             .involvedAccounts(participants)
                             .amountForUsers(amountForUsers)

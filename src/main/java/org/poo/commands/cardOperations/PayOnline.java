@@ -8,10 +8,13 @@ import org.poo.accounts.BusinessAccount;
 import org.poo.cards.Card;
 import org.poo.commands.Command;
 import org.poo.commands.accountOperations.cashbackInstances.CashbackContext;
-import org.poo.instances.*;
+import org.poo.instances.CommandData;
 import org.poo.transactions.Transaction;
 import org.poo.bankManager.Bank;
 import org.poo.bankManager.CurrencyConverter;
+import org.poo.instances.Commerciant;
+import org.poo.instances.Plan;
+import org.poo.instances.User;
 
 public class PayOnline implements Command {
     private CommandData command;
@@ -45,8 +48,8 @@ public class PayOnline implements Command {
         User user = this.bank.getUserByEmail(email);
         Card card = this.bank.getCardByCardNumber(cardNumber);
         Account account = this.bank.getAccountByCardNumber(cardNumber);
-        System.out.println("timestamp " + timestamp + " new payOnline command " + user.getEmail());
-        System.out.println("commerciant string " + commerciantString);
+//        System.out.println("timestamp " + timestamp + " new payOnline command " + user.getEmail());
+//        System.out.println("commerciant string " + commerciantString);
 //        System.out.println("card is " + card.getCardNumber() + " account is " + account.getIban() + " user who tries to pay " + email +" timestamp " + timestamp);
 //        for (Card cardIter : account.getCards()) {
 //            System.out.println("card " + cardIter.getCardNumber());
@@ -62,6 +65,7 @@ public class PayOnline implements Command {
                 card = null;
             }
         }
+
         if (card == null) {
             // if the card is not found, print an error message
             ObjectMapper objectMapper = new ObjectMapper();
@@ -100,20 +104,23 @@ public class PayOnline implements Command {
         double commission = Plan.getCommission(user.getPlanType(), amountConverted,
                 account.getCurrency());
 
+        Commerciant commerciant = this.bank.getCommerciantByName(commerciantString);
 
-            System.out.println("trying to pay amount " + amount + " amountConverted "
-                    + amountConverted + " commission " + commission + " balance" + card.getParentAccount().getBalance());
+//            System.out.println("trying to pay amount " + amount + " amountConverted "
+//                    + amountConverted + " commission " + commission + " balance" + card.getParentAccount().getBalance());
         // check if the account has enough money and pay
-        if (card.getParentAccount().getBalance() >= amountConverted + commission) {
-            Commerciant commerciant = this.bank.getCommerciantByName(commerciantString);
+        boolean canPay = account.handleMoneyTransactions(user, -amountConverted, commerciant);
+
+        if (card.getParentAccount().getBalance() >= amountConverted + commission && canPay
+                && commerciant != null) {
             CashbackContext cashbackContext =
                     new CashbackContext(commerciant.getCashbackStrategy());
 
             card.pay(amountConverted + commission);
 
-                System.out.print(this.command.getCommand() + " | took commission " + commission + " for email " + email +
-                        " timestamp " + timestamp);
-                System.out.print(" | new balance " + account.getBalance() + "\n");
+//                System.out.print(this.command.getCommand() + " | took commission " + commission + " for email " + email +
+//                        " timestamp " + timestamp);
+//                System.out.print(" | new balance " + account.getBalance() + "\n");
 
 
             // get the cashback discount benefit if the user reached the milestones for nrOfTransactions
@@ -125,11 +132,11 @@ public class PayOnline implements Command {
             // update the number of transactions for the commerciant
             account.updateNrOfTransactions(commerciant);
 
-            // TODO: Odată ce un cashback a fost primit, nu contează de la care comerciant, nu se va mai primi a2a oară.
+            // calculate the future cashback for the sender
             cashbackContext.calculateFutureCashback(account, user, commerciant);
 
             // get the cashback benefit for spending threshold
-            cashbackContext.useCashback(user, account, commerciant, amountConverted);
+            cashbackContext.useCashback(account, commerciant, amountConverted);
 
             // add the successful transaction to the account
             transaction = new Transaction.TransactionBuilder(timestamp,
@@ -144,14 +151,12 @@ public class PayOnline implements Command {
                     cardNumber, card.getCardNumber(), account, email);
 
             // check if the user can upgrade its plan from silver to gold automatically
-            // TODO:  Tranzactiile mai mari de 300 RON incep sa se contorizeze abia cand planul utilizatorului este silver
             if (user.getPlanType().equals(Plan.PlanType.SILVER)) {
                 Plan.checkIfCanUpgrade(user);
             }
 
-            account.handleMoneyTransactions(user, -amountConverted, commerciant);
-            System.out.println("timestamp " + timestamp + " Paid " + amount + " commision " + commission + " to " + commerciantString + " with card " +
-                    cardNumber + " from account owner " + account.getOwner().getEmail() + " with balance " + account.getBalance() + " and plan " + user.getPlanType());
+//            System.out.println("timestamp " + timestamp + " Paid " + amount + " commision " + commission + " to " + commerciantString + " with card " +
+//                    cardNumber + " from account " + account.getIban()+ " with balance " + account.getBalance() + " and plan " + user.getPlanType());
 
         } else {
             // if the account doesn't have enough money, add an error transaction

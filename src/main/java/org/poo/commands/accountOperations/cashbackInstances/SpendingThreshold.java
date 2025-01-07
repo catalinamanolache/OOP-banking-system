@@ -9,45 +9,50 @@ import java.util.Map;
 
 public class SpendingThreshold implements CashbackStrategy {
     @Override
-    public double calculateCashback(Account account, User user, Commerciant commerciant) {
-        double cashback = 0;
-
+    public void calculateCashback(Account account, User user, Commerciant commerciant) {
 //        System.out.println("FutureCashback strategy: Spending threshold");
         Map<Commerciant, Double> totalSpentMap = account.getTotalSpent();
+        Map<Commerciant, Double> cashbackMap = account.getSpendingThresholdCashback();
 
-        if (!totalSpentMap.containsKey(commerciant)) {
-            return -1;
+        // can comment next line?
+//        if (!totalSpentMap.containsKey(commerciant)) {
+//            return;
+//        }
+
+        Plan.PlanType planType = user.getPlanType();
+        if (!account.getOwner().equals(user)) {
+            planType = account.getOwner().getPlanType();
         }
-
+        
         double totalSpent = totalSpentMap.get(commerciant);
-
-        System.out.print(user.getEmail() + " totalSpent: " + totalSpent + " at " + commerciant.getCommerciant());
+        double cashback = 0;
+//        System.out.print(user.getEmail() + " totalSpent: " + totalSpent + " at " + commerciant.getCommerciant());
         if (totalSpent >= 100 && totalSpent < 300) {
-            if (user.getPlanType().equals(Plan.PlanType.STANDARD) || user.getPlanType().equals(Plan.PlanType.STUDENT)) {
+            if (planType.equals(Plan.PlanType.STANDARD) || planType.equals(Plan.PlanType.STUDENT)) {
                 cashback = 0.1 / 100;
-            } else if (user.getPlanType().equals(Plan.PlanType.SILVER)) {
+            } else if (planType.equals(Plan.PlanType.SILVER)) {
                 cashback = 0.3 / 100;
             } else {
                 cashback = 0.5 / 100;
             }
         } else if (totalSpent >= 300 && totalSpent < 500) {
-            if (user.getPlanType().equals(Plan.PlanType.STANDARD) || user.getPlanType().equals(Plan.PlanType.STUDENT)) {
+            if (planType.equals(Plan.PlanType.STANDARD) || planType.equals(Plan.PlanType.STUDENT)) {
                 cashback = 0.2 / 100;
-            } else if (user.getPlanType().equals(Plan.PlanType.SILVER)) {
+            } else if (planType.equals(Plan.PlanType.SILVER)) {
                 cashback = 0.4 / 100;
             } else {
                 cashback = 0.55 / 100;
             }
         } else if (totalSpent >= 500) {
-            if (user.getPlanType().equals(Plan.PlanType.STANDARD) || user.getPlanType().equals(Plan.PlanType.STUDENT)) {
+            if (planType.equals(Plan.PlanType.STANDARD) || planType.equals(Plan.PlanType.STUDENT)) {
                 cashback = 0.25 / 100;
-            } else if (user.getPlanType().equals(Plan.PlanType.SILVER)) {
+            } else if (planType.equals(Plan.PlanType.SILVER)) {
                 cashback = 0.5 / 100;
             } else {
                 cashback = 0.7 / 100;
             }
         }
-        System.out.print(" | future cashback: " + cashback + "\n");
-        return cashback;
+        cashbackMap.put(commerciant, cashback);
+//        System.out.print(" | future cashback: " + cashback + "\n");
     }
 }

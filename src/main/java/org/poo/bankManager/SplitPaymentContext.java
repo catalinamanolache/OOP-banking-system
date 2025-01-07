@@ -21,7 +21,6 @@ public final class SplitPaymentContext {
 
     private int participantsLeftToAccept;
     private boolean refused;
-    private String refusedBy;
     private SplitPaymentType type;
     private String currency;
     private double amount;
@@ -33,7 +32,6 @@ public final class SplitPaymentContext {
         this.participantsMap = new TreeMap<>();
         this.participantsIbanList = new ArrayList<>();
         this.refused = false;
-        this.refusedBy = null;
         this.participantsLeftToAccept = 0;
         this.type = null;
         this.currency = null;
@@ -76,7 +74,6 @@ public final class SplitPaymentContext {
         }
 
         this.refused = false;
-        this.refusedBy = null;
         this.participantsLeftToAccept = participants.size();
         this.type = SplitPaymentType.valueOf(type.toUpperCase());
         this.currency = currency;
@@ -142,14 +139,6 @@ public final class SplitPaymentContext {
 
     public void setRefused(final boolean refused) {
         this.refused = refused;
-    }
-
-    public String getRefusedBy() {
-        return refusedBy;
-    }
-
-    public void setRefusedBy(final String refusedBy) {
-        this.refusedBy = refusedBy;
     }
 
     public int getParticipantsLeftToAccept() {

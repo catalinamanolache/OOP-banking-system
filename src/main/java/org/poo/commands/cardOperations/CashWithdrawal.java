@@ -25,6 +25,9 @@ public class CashWithdrawal implements Command {
         this.output = output;
     }
 
+    /**
+     * Executes the cashWithdrawal command.
+     */
     @Override
     public void execute() {
         String cardNumber = this.command.getCardNumber();
@@ -36,8 +39,8 @@ public class CashWithdrawal implements Command {
         User user = this.bank.getUserByEmail(email);
         ObjectMapper objectMapper = new ObjectMapper();
 
+        // if the user is not found, print an error
         if (user == null) {
-            // TODO: transaction or output "User not found"
             System.out.println("User not found in cashWithdrawal");
             ObjectNode objectNode = objectMapper.createObjectNode();
 
@@ -55,9 +58,12 @@ public class CashWithdrawal implements Command {
             return;
         }
 
+        // get the account and card by card number
         Account account = this.bank.getAccountByCardNumber(cardNumber);
         Card card = this.bank.getCardByCardNumber(cardNumber);
 
+        // if the account is a business account, check if the user is associated with the business
+        // if not, set the account to null (the user is not allowed to withdraw money)
         if (account != null && account.getAccountType().equals(Account.AccountType.BUSINESS)) {
             BusinessAccount businessAccount = (BusinessAccount) account;
             if (!businessAccount.isUserAssociatedWithBusiness(user)) {
@@ -65,21 +71,21 @@ public class CashWithdrawal implements Command {
             }
         }
 
+        // if the account is not found or the card does not belong to the user, print an error
         if (account == null || !card.getOwner().equals(user)) {
-            System.out.println("Account not found in cashWithdrawal");
-            // TODO: transaction or output "Account not found"/ "Card not found"??
             ObjectNode result = objectMapper.createObjectNode();
             result.put("command", this.command.getCommand());
 
-            ObjectNode output = objectMapper.createObjectNode();
-            output.put("timestamp", timestamp);
-            output.put("description", "Card not found");
-            result.set("output", output);
+            ObjectNode outputNode = objectMapper.createObjectNode();
+            outputNode.put("timestamp", timestamp);
+            outputNode.put("description", "Card not found");
+            result.set("output", outputNode);
             result.put("timestamp", timestamp);
             this.output.add(result);
             return;
         }
 
+        // convert the amount to the account's currency, since we only withdraw RON
         double amountConverted = CurrencyConverter.convert("RON", account.getCurrency(),
                 amount);
 
@@ -87,13 +93,8 @@ public class CashWithdrawal implements Command {
         double commission = Plan.getCommission(user.getPlanType(), amountConverted,
                 account.getCurrency());
 
-//        System.out.println("Total amount " + (amountConverted + commission) + " RON");
-//        System.out.println("Fee " + commission + " RON");
-//        System.out.println("Converted amount " + amountConverted + " " + account.getCurrency());
-//        System.out.println("Account balance " + account.getBalance() + " " + account.getCurrency());
-
+        // if the user doesn't have enough funds, print an error
         if (amountConverted + commission > account.getBalance()) {
-            // TODO: transaction or output "Insufficient funds"
             Transaction transaction;
             transaction = new Transaction.TransactionBuilder(timestamp,
                     "Insufficient funds", this.command.getCommand())
@@ -104,11 +105,8 @@ public class CashWithdrawal implements Command {
             return;
         }
 
+        // withdraw the amount and the commission and add a transaction
         account.withdraw(amountConverted + commission);
-
-        System.out.print(this.command.getCommand() + " paid " + amountConverted + account.getCurrency() + " account " + account.getIban() + " took commission " + commission + " for email " + email +
-                " timestamp " + timestamp);
-        System.out.print(" | new balance " + account.getBalance() + "\n");
 
         Transaction transaction;
         transaction = new Transaction.TransactionBuilder(timestamp,
@@ -116,6 +114,5 @@ public class CashWithdrawal implements Command {
                 .amount(amount)
                 .build();
         account.addTransaction(transaction);
-//        System.out.println("CashWithdrawal");
     }
 }

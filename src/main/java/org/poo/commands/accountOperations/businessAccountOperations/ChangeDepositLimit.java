@@ -21,6 +21,9 @@ public class ChangeDepositLimit implements Command {
         this.output = output;
     }
 
+    /**
+     * Executes the changeDepositLimit command.
+     */
     @Override
     public void execute() {
         String email = this.command.getEmail();
@@ -42,11 +45,22 @@ public class ChangeDepositLimit implements Command {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
+        // if the account is not a business account, print an error
         if (!account.getAccountType().equals(Account.AccountType.BUSINESS)) {
             System.out.println("not a business account in change deposit limit.");
+            ObjectNode resultNode = objectMapper.createObjectNode();
+            resultNode.put("command", "changeSpendingLimit");
+
+            ObjectNode outputNode = objectMapper.createObjectNode();
+            outputNode.put("description", "This is not a business account");
+            outputNode.put("timestamp", timestamp);
+            resultNode.set("output", outputNode);
+            resultNode.put("timestamp", timestamp);
+            this.output.add(resultNode);
             return;
         }
 
+        // if the user is not the owner of the account, print an error
         if (!account.getOwner().getEmail().equals(email)) {
             ObjectNode resultNode = objectMapper.createObjectNode();
             resultNode.put("command", this.command.getCommand());
@@ -63,15 +77,8 @@ public class ChangeDepositLimit implements Command {
             return;
         }
 
-        if (!account.getOwner().getEmail().equals(email)) {
-            // TODO: You are not authorized to make this transaction.
-            System.out.println("You are not authorized to make this transaction in change deposit limit.");
-            return;
-        }
-
+        // change the deposit limit of the account
         BusinessAccount businessAccount = (BusinessAccount) account;
-//        double convertedDepositLimit = CurrencyConverter.convert("RON",
-//                businessAccount.getCurrency(), depositLimit);
         businessAccount.setDepositLimit(depositLimit);
         System.out.println("Deposit limit changed successfully to " + depositLimit + " timestamp: " + timestamp);
     }

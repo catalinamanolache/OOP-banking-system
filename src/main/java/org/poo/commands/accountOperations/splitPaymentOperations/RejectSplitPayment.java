@@ -28,6 +28,9 @@ public class RejectSplitPayment implements Command {
         this.output = output;
     }
 
+    /**
+     * Execute the rejectSplitPayment command.
+     */
     @Override
     public void execute() {
         String email = this.command.getEmail();
@@ -36,29 +39,20 @@ public class RejectSplitPayment implements Command {
         Map<Integer, SplitPaymentContext> splitPaymentContextMap =
                 new TreeMap<>(this.bank.getSplitPaymentContextMap());
 
-//        for (Map.Entry<Integer, SplitPaymentContext> contextEntry : splitPaymentContextMap.entrySet()) {
-//            Map<String, List<String>> participantsMap = contextEntry.getValue().getParticipantsMap();
-//            SplitPaymentContext.SplitPaymentType splitPaymentType =
-//                    SplitPaymentContext.SplitPaymentType.valueOf(type.toUpperCase());
-//            for (Map.Entry<String, List<String>> participantEntry : participantsMap.entrySet()) {
-//                if (participantEntry.getKey().equals(email)
-//                        && contextEntry.getValue().getType().equals(splitPaymentType)) {
-//                    this.context = contextEntry.getValue();
-//                    break;
-//                }
-//            }
-//        }
-        for (Map.Entry<Integer, SplitPaymentContext> contextEntry : splitPaymentContextMap.entrySet()) {
-            SplitPaymentContext context = contextEntry.getValue();
-            if (context.getParticipantsMap().containsKey(email)
-                    && context.getType().toString().equalsIgnoreCase(type)) {
-                this.context = context;
+        // find the split payment context of the given type that the user is involved in
+        for (Map.Entry<Integer, SplitPaymentContext> contextEntry
+                : splitPaymentContextMap.entrySet()) {
+            SplitPaymentContext currContext = contextEntry.getValue();
+            if (currContext.getParticipantsMap().containsKey(email)
+                    && currContext.getType().toString().equalsIgnoreCase(type)) {
+                this.context = currContext;
                 break;
             }
         }
 
         User user = this.bank.getUserByEmail(email);
 
+        // if the user is not found, add an error message to the output
         if (user == null) {
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode resultNode = objectMapper.createObjectNode();
@@ -74,30 +68,30 @@ public class RejectSplitPayment implements Command {
         }
 
         if (this.context == null) {
-            System.out.println("context is null in reject split payment timestamp " + timestamp);
             return;
         }
 
+        // only refuse the payment if it wasn't already refused
         if (!this.context.isRefused()) {
             this.context.setRefused(true);
-            this.context.setRefusedBy(email);
-            System.out.println(" participant " + email + " rejected the payment " + type + " timestamp " + timestamp + "  for timestamp originated at " + this.context.getStartedTimestamp());
 
+            // get the split payment's details
             List<String> participants = new ArrayList<>(this.context.getParticipantsIbanList());
             int accountsNumber = participants.size();
             String currency = this.context.getCurrency();
             double amount = this.context.getAmount();
             List<Double> amountForUsers = new ArrayList<>(this.context.getAmountForUsers());
-            String refusedBy = this.context.getRefusedBy();
             int startedTimestamp = this.context.getStartedTimestamp();
+            String splitType = this.context.getType().toString().toLowerCase();
 
+            // add a failed transaction to each account involved in the split payment
             for (int i = 0; i < accountsNumber; i++) {
                 Account accountInvolved = this.bank.getAccountByIban(participants.get(i));
 
                 if (accountInvolved == null) {
-                    System.out.println("account at position " + i + " is null in reject split payment");
                     continue;
                 }
+
                 String formattedAmount = String.format("%.2f", amount);
 
                 Transaction transaction;
@@ -106,16 +100,16 @@ public class RejectSplitPayment implements Command {
                         "splitPayment")
                         .currency(currency)
                         .amountForUsers(amountForUsers)
-                        .splitPaymentType(this.context.getType().toString().toLowerCase())
+                        .splitPaymentType(splitType)
                         .amount(amountForUsers.get(i))
                         .involvedAccounts(participants)
                         .error("One user rejected the payment.")
                         .build();
-//                System.out.println("reject transaction added to account " + accountInvolved.getIban());
                 accountInvolved.addTransaction(transaction);
             }
 
-            this.bank.getSplitPaymentContextMap().remove(this.context.getStartedTimestamp());
+            // remove the current split payment context from the bank
+            this.bank.getSplitPaymentContextMap().remove(startedTimestamp);
         }
     }
 }

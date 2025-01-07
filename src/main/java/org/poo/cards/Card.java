@@ -65,11 +65,19 @@ public class Card {
         this.cardNumber = cardNumber;
     }
 
+    /**
+     * Get the owner of the card.
+     * @return the owner of the card
+     */
     public User getOwner() {
         return owner;
     }
 
-    public void setOwner(User owner) {
+    /**
+     * Set the owner of the card.
+     * @param owner the owner of the card
+     */
+    public void setOwner(final User owner) {
         this.owner = owner;
     }
 
@@ -81,11 +89,11 @@ public class Card {
      * @param oldCardNumber the old card number
      * @param newCardNumber the new card number
      * @param account the account
-     * @param owner the owner of the account
+     * @param ownerString the owner of the account
      */
     public void handleTransactions(final int timestamp, final String command, final String iban,
                                    final String oldCardNumber, final String newCardNumber,
-                                   final Account account, final String owner) {
+                                   final Account account, final String ownerString) {
     }
 
     /**

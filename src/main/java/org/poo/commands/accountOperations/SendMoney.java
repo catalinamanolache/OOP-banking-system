@@ -6,7 +6,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.commands.Command;
 import org.poo.commands.accountOperations.cashbackInstances.CashbackContext;
-import org.poo.instances.*;
+import org.poo.instances.CommandData;
+import org.poo.instances.Commerciant;
+import org.poo.instances.Plan;
+import org.poo.instances.User;
 import org.poo.transactions.Transaction;
 import org.poo.bankManager.Bank;
 import org.poo.bankManager.CurrencyConverter;
@@ -36,14 +39,12 @@ public class SendMoney implements Command {
         int timestamp = this.command.getTimestamp();
         String email = this.command.getEmail();
 
-//        System.out.println("context " + this.bank.getSplitPaymentContext().getParticipants());
-
-        // get the sender and receiver accounts
+        // get the sender and receiver accounts and the alias map
         Account senderAccount;
         Account receiverAccount;
         Map<String, String> aliasMap = this.bank.getAliasMap();
 
-        // check if the sender and receiver are aliases and get the real account
+        // check if the sender and receiver are aliases and get the real accounts
         if (this.bank.getAccountByIban(senderIban) == null) {
             senderAccount = this.bank.getAccountByIban(aliasMap.get(senderIban));
         } else {
@@ -56,11 +57,11 @@ public class SendMoney implements Command {
             receiverAccount = this.bank.getAccountByIban(receiverIban);
         }
 
-//        System.out.println("receiver iban " + receiverIban + " receiver account " + receiverAccount + " currency " + receiverAccount.getCurrency());
-//        System.out.println("sender iban " + senderIban + " sender account " + senderAccount + " currency " + senderAccount.getCurrency());
+        boolean isReceiverCommerciant = false;
+
         // if the accounts are still not found, try to find the receiver in the commerciants list
         if (senderAccount == null || receiverAccount == null) {
-            // if the receiver belongs to the commerciants list, do not consider it as a real account
+            // if the receiver belongs to the commerciants list, set the flag to true
             Commerciant receiverCommerciant = this.bank.getCommerciantByIban(receiverIban);
 
             // if the receiver is still not found, print an error message
@@ -78,11 +79,13 @@ public class SendMoney implements Command {
                 resultNode.set("output", outputNode);
                 this.output.add(resultNode);
                 return;
+            } else {
+                isReceiverCommerciant = true;
             }
         }
 
         double convertedAmount;
-        if (receiverAccount != null) {
+        if (!isReceiverCommerciant) {
             // convert the amount to the receiver's currency
             convertedAmount = CurrencyConverter.convert(senderAccount.getCurrency(),
                             receiverAccount.getCurrency(), amount);
@@ -93,14 +96,23 @@ public class SendMoney implements Command {
 
         // compute the commission depending on the sender user's plan
         User senderUser = this.bank.getUserByEmail(email);
+
         double commission;
         if (senderAccount.getAccountType().equals(Account.AccountType.BUSINESS)) {
+            // if the sender is a business account, get the commission from the owner's plan
             commission = Plan.getCommission(senderAccount.getOwner().getPlanType(), amount,
                     senderAccount.getCurrency());
         } else {
             commission = Plan.getCommission(senderUser.getPlanType(), amount,
                     senderAccount.getCurrency());
         }
+
+        Commerciant commerciant = this.bank.getCommerciantByIban(receiverIban);
+
+        // for a business account, check if the user spends in the limit of the account
+        // for a personal account, this is always true
+        boolean canPay
+                = senderAccount.handleMoneyTransactions(senderUser, -convertedAmount, commerciant);
 
         // check if the sender has enough funds and if not, add an error transaction to the sender
         if (senderAccount.getBalance() < amount + commission) {
@@ -109,12 +121,12 @@ public class SendMoney implements Command {
                     "Insufficient funds", this.command.getCommand())
                     .build();
             senderAccount.addTransaction(transactionSender);
-        } else {
+        } else if (canPay) {
             // withdraw the amount and the commision from the sender and deposit it to the receiver
             senderAccount.withdraw(amount + commission);
 
             // only deposit if the receiver is not a commerciant
-            if (receiverAccount != null) {
+            if (!isReceiverCommerciant) {
                 receiverAccount.deposit(convertedAmount);
             }
 
@@ -125,15 +137,16 @@ public class SendMoney implements Command {
 //                    " to " + receiverAccount.getOwner().getEmail() + " in currency " + receiverAccount.getCurrency()+ " and paid a commission of " + commission + " " +
 //                    senderAccount.getCurrency() + " sender plan " + senderUser.getPlanType());
 
-            // TODO:Pentru sendMoney cand destinatarul este un comerciant, se va lua currency-ul contului din care se face plata.
-            Commerciant commerciant = this.bank.getCommerciantByIban(receiverIban);
-            if (commerciant != null) {
+            // if the receiver is a commerciant, calculate the cashback for this transaction
+            if (isReceiverCommerciant) {
                 CashbackContext cashbackContext =
                         new CashbackContext(commerciant.getCashbackStrategy());
+
                 String currency = senderAccount.getCurrency();
 
-                // get the cashback discount benefit if the user reached the milestones for nrOfTransactions
-                cashbackContext.useDiscountCashback(senderUser, senderAccount, commerciant, convertedAmount);
+                // get the cashback discount benefit for nrOfTransactions
+                cashbackContext.useDiscountCashback(senderUser, senderAccount,
+                        commerciant, convertedAmount);
 
                 // update the total spent for the commerciant
                 senderAccount.updateTotalSpent(commerciant, amount, currency);
@@ -141,15 +154,13 @@ public class SendMoney implements Command {
                 // update the number of transactions for the commerciant
                 senderAccount.updateNrOfTransactions(commerciant);
 
+                // calculate the future cashback for the sender
                 cashbackContext.calculateFutureCashback(senderAccount, senderUser, commerciant);
 
                 // get the cashback benefit for spending threshold
-                cashbackContext.useCashback(senderUser, senderAccount, commerciant, convertedAmount);
-
-                senderAccount.handleMoneyTransactions(senderUser, -convertedAmount, commerciant);
+                cashbackContext.useCashback(senderAccount, commerciant, convertedAmount);
 
                 // check if the user can upgrade its plan from silver to gold automatically
-                // TODO:  Tranzactiile mai mari de 300 RON incep sa se contorizeze abia cand planul utilizatorului este silver
                 if (senderUser.getPlanType().equals(Plan.PlanType.SILVER)) {
                     Plan.checkIfCanUpgrade(senderUser);
                 }

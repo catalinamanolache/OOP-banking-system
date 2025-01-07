@@ -53,12 +53,11 @@ public class CheckCardStatus implements Command {
         if (account.getBalance() <= account.getMinBalance()) {
             Transaction transaction;
             transaction = new Transaction.TransactionBuilder(timestamp,
-                    "You have reached the minimum amount of funds, the card will be frozen",
-                    this.command.getCommand())
+                    "You have reached the minimum amount of funds, "
+                           + "the card will be frozen", this.command.getCommand())
                     .build();
             account.addTransaction(transaction);
             card.setIsFrozen(true);
-            System.out.println("Card " + card.getCardNumber() + " has been frozen timestamp: " + timestamp);
         }
     }
 }

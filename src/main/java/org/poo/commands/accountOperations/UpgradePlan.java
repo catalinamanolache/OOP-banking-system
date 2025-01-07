@@ -23,6 +23,9 @@ public class UpgradePlan implements Command {
         this.output = output;
     }
 
+    /**
+     * Executes the upgradePlan command.
+     */
     @Override
     public void execute() {
         String newPlanTypeString = this.command.getNewPlanType();
@@ -30,6 +33,8 @@ public class UpgradePlan implements Command {
         int timestamp = this.command.getTimestamp();
 
         Account account = this.bank.getAccountByIban(iban);
+
+        // if the account is not found, print an error
         if (account == null) {
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode objectNode = objectMapper.createObjectNode();
@@ -49,23 +54,23 @@ public class UpgradePlan implements Command {
         }
         User user = account.getOwner();
 
+        // get the old and new plan type of the user
         Plan.PlanType oldPlanType = user.getPlanType();
         Plan.PlanType newPlanType = Plan.PlanType.valueOf(newPlanTypeString.toUpperCase());
 
-        if (checkIfDowngrade(oldPlanType, newPlanType)) {
-            // TODO: “You cannot downgrade your plan.”
+        // if the user tries to downgrade the plan, create an error transaction
+        if (Plan.checkIfDowngrade(oldPlanType, newPlanType)) {
             Transaction transaction;
             transaction = new Transaction.TransactionBuilder(timestamp,
                     "You cannot downgrade your plan.", this.command.getCommand())
                     .error("downgrade")
                     .build();
             account.addTransaction(transaction);
-            System.out.println("You cannot downgrade your plan");
             return;
         }
 
+        // if the user already has the new plan type, create an error transaction
         if (oldPlanType.equals(newPlanType)) {
-            // TODO: “The user already has the ${newPlanType} plan.”
             Transaction transaction;
             transaction = new Transaction.TransactionBuilder(timestamp,
                     "The user already has the " + newPlanType.name().toLowerCase()
@@ -73,17 +78,16 @@ public class UpgradePlan implements Command {
                     .error("already has the plan")
                     .build();
             account.addTransaction(transaction);
-            System.out.println("The user already has the " + newPlanType.name().toLowerCase() + " plan");
             return;
         }
 
+        // get the fee for upgrading the plan and convert it to the account's currency
         double fee = Plan.getPlanFee(oldPlanType, newPlanType);
         double convertedFee = CurrencyConverter.convert("RON", account.getCurrency(),
                 fee);
 
-        // TODO: check with minBalance?
+        // if the user doesn't have enough funds to upgrade, create an error transaction
         if (convertedFee > account.getBalance()) {
-            // TODO: “Insufficient funds.”
             Transaction transaction;
             transaction = new Transaction.TransactionBuilder(timestamp,
                     "Insufficient funds", this.command.getCommand())
@@ -94,8 +98,11 @@ public class UpgradePlan implements Command {
             return;
         }
 
+        // withdraw the fee from the account and upgrade the user's plan
         account.withdraw(convertedFee);
         user.setPlanType(newPlanType);
+
+        // create a successful transaction for the upgrade
         Transaction transaction;
         transaction = new Transaction.TransactionBuilder(timestamp,
                 "Upgrade plan", this.command.getCommand())
@@ -103,14 +110,5 @@ public class UpgradePlan implements Command {
                 .newPlanType(newPlanTypeString)
                 .build();
         account.addTransaction(transaction);
-        // TODO: Utilizatorul nu trebuie să plăteasca neapărat fee-ul pentru upgrade de la silver
-        //  la gold întrucât se va face upgrade automat dacă userul face 5 plăți de cel putin
-        //  300RON fiecare. !!! adica in payOnline
-        System.out.println("Upgrade plan");
-
-    }
-    // TODO: student to standard??
-    private boolean checkIfDowngrade(Plan.PlanType currentPlan, Plan.PlanType newPlan) {
-        return currentPlan.compareTo(newPlan) > 0;
     }
 }

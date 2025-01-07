@@ -61,10 +61,7 @@ public class BusinessReport implements Command {
         ObjectNode report = objectMapper.createObjectNode();
         report.put("IBAN", iban);
 
-        String formattedBalance = String.format("%.2f", balance);
-        double newBalance = Double.parseDouble(formattedBalance);
-        report.put("balance", newBalance);
-
+        report.put("balance", balance);
         report.put("currency", currency);
 
         String formattedSpendingLimit = String.format("%.2f", spendingLimit);
@@ -137,20 +134,39 @@ public class BusinessReport implements Command {
                     = businessAccount.getTotalSpentAtCommerciantsMap();
             Map<Commerciant, Double> sortedCommerciantsMap
                     = new TreeMap<>(Comparator.comparing(Commerciant::getCommerciant));
-            sortedCommerciantsMap.putAll(totalSpentAtCommerciantMap);
+//            sortedCommerciantsMap.putAll(totalSpentAtCommerciantMap);
+
+            for (Map.Entry<Commerciant, Double> entry : totalSpentAtCommerciantMap.entrySet()) {
+                if (entry.getKey() == null) {
+                    System.out.println("entry " + entry.getKey() + " " + entry.getValue());
+                } else {
+                    System.out.println("entry " + entry.getKey().getCommerciant() + " " + entry.getValue());
+
+                }
+                if (entry.getValue() == 0) {
+                    continue;
+                }
+                Commerciant commerciant = entry.getKey();
+                double totalSpentAtCommerciant = entry.getValue();
+                if (commerciant == null) {
+                    System.out.println("commerciant is null");
+                    continue;
+                }
+                sortedCommerciantsMap.put(commerciant, totalSpentAtCommerciant);
+            }
+            User owner = businessAccount.getOwner();
 
             for (Map.Entry<Commerciant, Double> entry : sortedCommerciantsMap.entrySet()) {
                 ObjectNode commerciantNode = objectMapper.createObjectNode();
                 Commerciant commerciant = entry.getKey();
                 List<User> usersWhoSpentAtCommerciant =
                         businessAccount.getUsersWhoSpentAtCommerciant(commerciant);
-                double totalSpentAtCommerciant = entry.getValue();
-                System.out.println("total spent at commerciant: " + totalSpentAtCommerciant + " commerciant name: " + commerciant.getCommerciant() + " users who spent: " + usersWhoSpentAtCommerciant);
-                commerciantNode.put("commerciant", commerciant.getCommerciant());
 
-                String formattedTotalReceived = String.format("%.2f", totalSpentAtCommerciant);
-                double newTotalReceived = Double.parseDouble(formattedTotalReceived);
-                commerciantNode.put("total received", newTotalReceived);
+                if (usersWhoSpentAtCommerciant.size() == 1 && usersWhoSpentAtCommerciant.get(0).equals(owner)) {
+                    continue;
+                }
+
+                commerciantNode.put("commerciant", commerciant.getCommerciant());
 
                 ArrayNode managersArray = objectMapper.createArrayNode();
                 ArrayNode employeesArray = objectMapper.createArrayNode();
@@ -168,6 +184,11 @@ public class BusinessReport implements Command {
                     } else {
                         sortedManagers.add(name);
                     }
+                    double totalSpentAtCommerciant = businessAccount.getTotalSpentAtCommerciantByUser(commerciant, user);
+                    System.out.println("total spent at commerciant: " + totalSpentAtCommerciant + " commerciant name: " + commerciant.getCommerciant() + " users who spent: " + usersWhoSpentAtCommerciant);
+                    String formattedTotalReceived = String.format("%.2f", totalSpentAtCommerciant);
+                    double newTotalReceived = Double.parseDouble(formattedTotalReceived);
+                    commerciantNode.put("total received", newTotalReceived);
                 }
 
                 for (String employee : sortedEmployees) {

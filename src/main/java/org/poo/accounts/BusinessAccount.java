@@ -232,6 +232,19 @@ public class BusinessAccount extends Account {
         return users;
     }
 
+    /**
+     * Gets the total amount spent at a commerciant by a user.
+     * @param commerciant the commerciant
+     * @param user the user
+     * @return the total amount spent at the commerciant by the user
+     */
+    public double getTotalSpentAtCommerciantByUser(final Commerciant commerciant, final User user) {
+        if (this.totalSpentBusiness.containsKey(user)
+                && this.totalSpentBusiness.get(user).containsKey(commerciant)) {
+            return this.totalSpentBusiness.get(user).get(commerciant);
+        }
+        return 0;
+    }
 
     /**
      * Gets the users of the business account.

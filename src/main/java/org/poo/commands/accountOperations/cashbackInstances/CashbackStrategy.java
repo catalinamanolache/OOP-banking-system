@@ -5,5 +5,13 @@ import org.poo.instances.Commerciant;
 import org.poo.instances.User;
 
 public interface CashbackStrategy {
-    double calculateCashback(Account account, User user, Commerciant commerciant);
+    /**
+     * Calculate the cashback for a user.
+     * @param account the account
+     * @param user the user
+     * @param commerciant the commerciant at which the user is paying
+     */
+    void calculateCashback(Account account, User user, Commerciant commerciant);
+    //  TODO: incasare cashback ca metoda
+//    void getCashback();
 }

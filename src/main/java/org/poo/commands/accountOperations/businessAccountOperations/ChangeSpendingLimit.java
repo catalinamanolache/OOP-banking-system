@@ -21,6 +21,9 @@ public class ChangeSpendingLimit implements Command {
         this.output = output;
     }
 
+    /**
+     * Executes the changeSpendingLimit command.
+     */
     @Override
     public void execute() {
         String email = this.command.getEmail();
@@ -42,6 +45,7 @@ public class ChangeSpendingLimit implements Command {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
+        // if the account is not a business account, print an error
         if (!account.getAccountType().equals(Account.AccountType.BUSINESS)) {
             System.out.println("not a business account in change spending limit.");
             ObjectNode resultNode = objectMapper.createObjectNode();
@@ -56,6 +60,7 @@ public class ChangeSpendingLimit implements Command {
             return;
         }
 
+        // if the user is not the owner of the account, print an error
         if (!account.getOwner().getEmail().equals(email)) {
             ObjectNode resultNode = objectMapper.createObjectNode();
             resultNode.put("command", this.command.getCommand());
@@ -68,21 +73,13 @@ public class ChangeSpendingLimit implements Command {
             resultNode.put("timestamp", timestamp);
             resultNode.set("output", outputNode);
             this.output.add(resultNode);
-            System.out.println("user " + email + " is not owenr of account " + iban + " the owner is " + account.getOwner().getEmail());
+            System.out.println("user " + email + " is not owenr of account " + iban + " the owner is " + account.getOwner().getEmail() + " timestamp " + timestamp);
             return;
         }
 
+        // change the spending limit of the account
         BusinessAccount businessAccount = (BusinessAccount) account;
-//        double convertedSpendingLimit = CurrencyConverter.convert("RON",
-//                businessAccount.getCurrency(), spendingLimit);
         businessAccount.setSpendingLimit(spendingLimit);
-        for (User users : businessAccount.getUserMap().get(BusinessAccount.UserType.EMPLOYEE)) {
-            System.out.println("employee " + users.getEmail());
-        }
-
-        for (User users : businessAccount.getUserMap().get(BusinessAccount.UserType.MANAGER)) {
-            System.out.println("manager " + users.getEmail());
-        }
         System.out.println("Spending limit changed successfully to " + spendingLimit + " timestamp: " + timestamp);
     }
 }

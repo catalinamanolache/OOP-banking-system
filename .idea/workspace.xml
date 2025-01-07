@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="36189c1d-567c-4522-9e71-01d5fd80ea68" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/remote-targets.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/remote-targets.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/test04_commisions_advanced.json" beforeDir="false" afterPath="$PROJECT_DIR$/input/test04_commisions_advanced.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/test11_errors.json" beforeDir="false" afterPath="$PROJECT_DIR$/input/test11_errors.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/test12_split_and_spend.json" beforeDir="false" afterPath="$PROJECT_DIR$/input/test12_split_and_spend.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/test13_more_savings.json" beforeDir="false" afterPath="$PROJECT_DIR$/input/test13_more_savings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/test14_more_business.json" beforeDir="false" afterPath="$PROJECT_DIR$/input/test14_more_business.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/test15_commerciants.json" beforeDir="false" afterPath="$PROJECT_DIR$/input/test15_commerciants.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/test16_split_and_withdraw_with_commisions.json" beforeDir="false" afterPath="$PROJECT_DIR$/input/test16_split_and_withdraw_with_commisions.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/test17_business_and_commerciant.json" beforeDir="false" afterPath="$PROJECT_DIR$/input/test17_business_and_commerciant.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/test18_large_input_part1.json" beforeDir="false" afterPath="$PROJECT_DIR$/input/test18_large_input_part1.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/test19_large_input_part2.json" beforeDir="false" afterPath="$PROJECT_DIR$/input/test19_large_input_part2.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/test20_large_input_part3.json" beforeDir="false" afterPath="$PROJECT_DIR$/input/test20_large_input_part3.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test02_upgrade_plan.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test02_upgrade_plan.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test04_commisions_advanced.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test04_commisions_advanced.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test08_advanced_split_payment.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test08_advanced_split_payment.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test10_business_account_limits.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test10_business_account_limits.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test11_errors.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test11_errors.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test12_split_and_spend.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test12_split_and_spend.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test13_more_savings.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test13_more_savings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test14_more_business.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test14_more_business.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test15_commerciants.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test15_commerciants.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test16_split_and_withdraw_with_commisions.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test16_split_and_withdraw_with_commisions.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test17_business_and_commerciant.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test17_business_and_commerciant.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test18_large_input_part1.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test18_large_input_part1.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test19_large_input_part2.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test19_large_input_part2.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test20_large_input_part3.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test20_large_input_part3.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/accounts/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/accounts/Account.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/accounts/BusinessAccount.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/accounts/BusinessAccount.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/bankManager/SplitPaymentContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/bankManager/SplitPaymentContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/cards/Card.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/cards/Card.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/AddFunds.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/AddFunds.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/DeleteAccount.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/DeleteAccount.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/SendMoney.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/SendMoney.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/SetMinimumBalance.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/SetMinimumBalance.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/UpgradePlan.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/UpgradePlan.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/businessAccountOperations/AddNewBusinessAssociate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/businessAccountOperations/AddNewBusinessAssociate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/businessAccountOperations/ChangeDepositLimit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/businessAccountOperations/ChangeDepositLimit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/businessAccountOperations/ChangeSpendingLimit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/businessAccountOperations/ChangeSpendingLimit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/CashbackContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/CashbackContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/CashbackStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/CashbackStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/NrOfTransactions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/NrOfTransactions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/SpendingThreshold.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/SpendingThreshold.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/savingsAccountOperations/WithdrawSavings.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/savingsAccountOperations/WithdrawSavings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/splitPaymentOperations/AcceptSplitPayment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/splitPaymentOperations/AcceptSplitPayment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/splitPaymentOperations/RejectSplitPayment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/splitPaymentOperations/RejectSplitPayment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/splitPaymentOperations/SplitPayment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/splitPaymentOperations/SplitPayment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/CashWithdrawal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/CashWithdrawal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/CheckCardStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/CheckCardStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/CreateCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/CreateCard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/DeleteCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/DeleteCard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/PayOnline.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/PayOnline.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/reportOperations/BusinessReport.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/reportOperations/BusinessReport.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/instances/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/instances/Constants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/instances/Plan.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/instances/Plan.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/utils/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/utils/Utils.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 6
+}]]></component>
+  <component name="ProjectId" id="2rJtIzGyCnv61LHa5LGSEUhsEBy" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Main.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="J-POO-Morgan-Proiect-2" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="J-POO-Morgan-Proiect-2" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.22562.218" />
+        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-IU-243.22562.218" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="36189c1d-567c-4522-9e71-01d5fd80ea68" name="Changes" comment="" />
+      <created>1736288931800</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1736288931800</updated>
+      <workItem from="1736288934281" duration="67000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

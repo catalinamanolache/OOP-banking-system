@@ -7,9 +7,6 @@ import org.poo.commands.Command;
 import org.poo.instances.CommandData;
 import org.poo.instances.User;
 
-import java.util.List;
-import java.util.Map;
-
 public class AddNewBusinessAssociate implements Command {
     private CommandData command;
     private Bank bank;
@@ -19,6 +16,9 @@ public class AddNewBusinessAssociate implements Command {
         this.bank = bank;
     }
 
+    /**
+     * Executes the addNewBusinessAssociate command.
+     */
     @Override
     public void execute() {
         String iban = this.command.getAccount();
@@ -37,24 +37,11 @@ public class AddNewBusinessAssociate implements Command {
             return;
         }
 
-//        if (!account.getOwner().equals(email)) {
-//            // TODO: You are not authorized to make this transaction.
-//            System.out.println("You are not authorized to make this transaction in add new business associate.");
-//            return;
-//        }
-
         User user = this.bank.getUserByEmail(email);
 
+        // add the user as a business associate with the given role
         BusinessAccount businessAccount = (BusinessAccount) account;
         businessAccount.addBusinessAssociate(user, BusinessAccount.UserType.valueOf(role));
-
-        for (Map.Entry< BusinessAccount.UserType, List<User>> entry : businessAccount.getUserMap().entrySet()) {
-            System.out.print(entry.getKey() + " ");
-            for (User u : entry.getValue()) {
-                System.out.print(u.getEmail() + " ");
-            }
-        }
-        System.out.println();
     }
 
 }

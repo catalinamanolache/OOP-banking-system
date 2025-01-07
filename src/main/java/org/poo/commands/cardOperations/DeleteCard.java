@@ -41,8 +41,8 @@ public class DeleteCard implements Command {
         // get the iban of the parent account
         String iban = cardToDelete.getParentAccount().getIban();
 
+        //
         if (!account.handleCardTransactions(cardToDelete, user)) {
-            System.out.println("You are not authorized to make this transaction in delete card.");
             return;
         }
 
