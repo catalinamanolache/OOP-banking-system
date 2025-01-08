@@ -12,6 +12,4 @@ public interface CashbackStrategy {
      * @param commerciant the commerciant at which the user is paying
      */
     void calculateCashback(Account account, User user, Commerciant commerciant);
-    //  TODO: incasare cashback ca metoda
-//    void getCashback();
 }

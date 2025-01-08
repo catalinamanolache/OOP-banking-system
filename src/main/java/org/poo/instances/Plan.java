@@ -79,12 +79,13 @@ public final class Plan {
      * Checks if a user can upgrade automatically from silver to gold
      * based on the transactions made.
      * @param user the user to check if can upgrade
+     * @return true if the user can upgrade, false otherwise
      */
-    public static void checkIfCanUpgrade(final User user) {
+    public static boolean checkIfCanUpgrade(final User user) {
         int validTransactionsCount = 0;
 
         if (!user.getPlanType().equals(PlanType.SILVER)) {
-            return;
+            return false;
         }
 
         // count the number of transactions that are greater than 300 RON
@@ -103,10 +104,11 @@ public final class Plan {
                     // if the user has at least 5 transactions greater than 300 RON, he can upgrade
                     if (validTransactionsCount >= AUTO_UPGRADE_NUMBER) {
                         user.setPlanType(PlanType.GOLD);
-                        break;
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 }

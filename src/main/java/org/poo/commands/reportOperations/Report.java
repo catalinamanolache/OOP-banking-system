@@ -52,9 +52,7 @@ public class Report implements Command {
 
         outputNode.put("IBAN", account.getIban());
 
-        String formattedBalance = String.format("%.2f", account.getBalance());
-        Double newBalance = Double.parseDouble(formattedBalance);
-        outputNode.put("balance", newBalance);
+        outputNode.put("balance", account.getBalance());
 
         outputNode.put("currency", account.getCurrency());
 

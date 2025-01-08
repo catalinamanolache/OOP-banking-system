@@ -43,9 +43,8 @@ final class FormatTransactions {
         if (!transaction.getDescription().equals("Insufficient funds")) {
             transactionNode.put("senderIBAN", transaction.getSenderIBAN());
             transactionNode.put("receiverIBAN", transaction.getReceiverIBAN());
-            String amount = String.format("%.2f", transaction.getAmount());
-            Double newAmount = Double.parseDouble(amount);
-            transactionNode.put("amount", newAmount + " "
+
+            transactionNode.put("amount", transaction.getAmount() + " "
                     + transaction.getCurrency());
             transactionNode.put("transferType", transaction.getTransferType());
         }
@@ -96,9 +95,8 @@ final class FormatTransactions {
         ObjectNode transactionNode = OBJECT_MAPPER.createObjectNode();
 
         if (transaction.getAmount() != 0.0 && transaction.getCommerciant() != null) {
-            String formattedAmount = String.format("%.2f", transaction.getAmount());
-            Double newFormattedAmount = Double.parseDouble(formattedAmount);
-            transactionNode.put("amount", newFormattedAmount);
+
+            transactionNode.put("amount", transaction.getAmount());
 
             transactionNode.put("commerciant", transaction.getCommerciant());
         }
@@ -152,9 +150,7 @@ final class FormatTransactions {
         }
 
         if (transaction.getSplitPaymentType().equals("equal")) {
-            String formattedAmount = String.format("%.2f", transaction.getAmount());
-            Double newFormattedAmount = Double.parseDouble(formattedAmount);
-            transactionNode.put("amount", newFormattedAmount);
+            transactionNode.put("amount", transaction.getAmount());
         }
 
         if (transaction.getError() != null) {
@@ -260,9 +256,7 @@ final class FormatTransactions {
         transactionNode.put("timestamp", transaction.getTimestamp());
         transactionNode.put("description", transaction.getDescription());
 
-        String formattedAmount = String.format("%.2f", transaction.getAmount());
-        Double newFormattedAmount = Double.parseDouble(formattedAmount);
-        transactionNode.put("amount", newFormattedAmount);
+        transactionNode.put("amount", transaction.getAmount());
 
         transactionNode.put("currency", transaction.getCurrency());
         return transactionNode;

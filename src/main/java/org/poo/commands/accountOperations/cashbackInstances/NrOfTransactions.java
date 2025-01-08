@@ -20,7 +20,7 @@ public class NrOfTransactions implements CashbackStrategy {
                 account.getNrOfTransactionsCashback();
 
 //        if (!cashbackMap.containsKey(Commerciant.CommerciantType.valueOf(commerciant.getType()))) {
-//            return -1;
+//            return;
 //        }
 
         // get how many transactions the user has made at the current commerciant
@@ -28,14 +28,14 @@ public class NrOfTransactions implements CashbackStrategy {
 
         // for each number of transactions, set the cashback percentage for the commerciant
         if (nrOfTransactions == 2) {
-            cashbackMap.put(Commerciant.CommerciantType.Food, 0.002);
-            System.out.println("will get cashback for food");
+            cashbackMap.put(Commerciant.CommerciantType.Food, 0.02);
+            System.out.println("after paying at " + commerciant.getCommerciant() + " " + user.getEmail() + " will get cashback for food");
         } else if (nrOfTransactions == 5) {
-            cashbackMap.put(Commerciant.CommerciantType.Clothes, 0.005);
-            System.out.println("will get cashback for clothes");
+            cashbackMap.put(Commerciant.CommerciantType.Clothes, 0.05);
+            System.out.println("after paying at " + commerciant.getCommerciant() + " " + user.getEmail() + " will get cashback for clothes");
         } else if (nrOfTransactions == 10) {
-            cashbackMap.put(Commerciant.CommerciantType.Tech, 0.01);
-            System.out.println("will get cashback for tech");
+            cashbackMap.put(Commerciant.CommerciantType.Tech, 0.1);
+            System.out.println("after paying at " + commerciant.getCommerciant() + " " + user.getEmail() + " will get cashback for tech");
         }
     }
 }

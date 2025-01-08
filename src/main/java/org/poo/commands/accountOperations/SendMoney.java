@@ -98,14 +98,14 @@ public class SendMoney implements Command {
         User senderUser = this.bank.getUserByEmail(email);
 
         double commission;
-        if (senderAccount.getAccountType().equals(Account.AccountType.BUSINESS)) {
-            // if the sender is a business account, get the commission from the owner's plan
-            commission = Plan.getCommission(senderAccount.getOwner().getPlanType(), amount,
-                    senderAccount.getCurrency());
-        } else {
+//        if (senderAccount.getAccountType().equals(Account.AccountType.BUSINESS)) {
+//            // if the sender is a business account, get the commission from the owner's plan
+//            commission = Plan.getCommission(senderAccount.getOwner().getPlanType(), amount,
+//                    senderAccount.getCurrency());
+//        } else {
             commission = Plan.getCommission(senderUser.getPlanType(), amount,
                     senderAccount.getCurrency());
-        }
+//        }
 
         Commerciant commerciant = this.bank.getCommerciantByIban(receiverIban);
 
@@ -145,7 +145,7 @@ public class SendMoney implements Command {
                 String currency = senderAccount.getCurrency();
 
                 // get the cashback discount benefit for nrOfTransactions
-                cashbackContext.useDiscountCashback(senderUser, senderAccount,
+                cashbackContext.useDiscount(senderUser, senderAccount,
                         commerciant, convertedAmount);
 
                 // update the total spent for the commerciant
@@ -155,9 +155,9 @@ public class SendMoney implements Command {
                 senderAccount.updateNrOfTransactions(commerciant);
 
                 // calculate the future cashback for the sender
-                cashbackContext.calculateFutureCashback(senderAccount, senderUser, commerciant);
+                cashbackContext.calculateCashback(senderAccount, senderUser, commerciant);
 
-                // get the cashback benefit for spending threshold
+//                // get the cashback benefit for spending threshold
                 cashbackContext.useCashback(senderAccount, commerciant, convertedAmount);
 
                 // check if the user can upgrade its plan from silver to gold automatically

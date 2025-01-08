@@ -41,9 +41,7 @@ public class PrintUsers implements Command {
                 ObjectNode accountObject = objectMapper.createObjectNode();
                 accountObject.put("IBAN", account.getIban());
 
-                String formatted = String.format("%.2f", account.getBalance());
-                double formattedBalance = Double.parseDouble(formatted);
-                accountObject.put("balance", formattedBalance);
+                accountObject.put("balance", account.getBalance());
 
                 accountObject.put("currency", account.getCurrency());
                 Account.AccountType accountType = account.getAccountType();

@@ -60,18 +60,10 @@ public class BusinessReport implements Command {
 
         ObjectNode report = objectMapper.createObjectNode();
         report.put("IBAN", iban);
-
         report.put("balance", balance);
         report.put("currency", currency);
-
-        String formattedSpendingLimit = String.format("%.2f", spendingLimit);
-        double newSpendingLimit = Double.parseDouble(formattedSpendingLimit);
-        report.put("spending limit", newSpendingLimit);
-
-        String formattedDepositLimit = String.format("%.2f", depositLimit);
-        double newDepositLimit = Double.parseDouble(formattedDepositLimit);
-        report.put("deposit limit", newDepositLimit);
-
+        report.put("spending limit", spendingLimit);
+        report.put("deposit limit", depositLimit);
 
         if (type.equals("transaction")) {
             List<User> managers = businessAccount.getUserMap().get(BusinessAccount.UserType.MANAGER);
@@ -134,7 +126,6 @@ public class BusinessReport implements Command {
                     = businessAccount.getTotalSpentAtCommerciantsMap();
             Map<Commerciant, Double> sortedCommerciantsMap
                     = new TreeMap<>(Comparator.comparing(Commerciant::getCommerciant));
-//            sortedCommerciantsMap.putAll(totalSpentAtCommerciantMap);
 
             for (Map.Entry<Commerciant, Double> entry : totalSpentAtCommerciantMap.entrySet()) {
                 if (entry.getKey() == null) {
@@ -186,9 +177,8 @@ public class BusinessReport implements Command {
                     }
                     double totalSpentAtCommerciant = businessAccount.getTotalSpentAtCommerciantByUser(commerciant, user);
                     System.out.println("total spent at commerciant: " + totalSpentAtCommerciant + " commerciant name: " + commerciant.getCommerciant() + " users who spent: " + usersWhoSpentAtCommerciant);
-                    String formattedTotalReceived = String.format("%.2f", totalSpentAtCommerciant);
-                    double newTotalReceived = Double.parseDouble(formattedTotalReceived);
-                    commerciantNode.put("total received", newTotalReceived);
+
+                    commerciantNode.put("total received", totalSpentAtCommerciant);
                 }
 
                 for (String employee : sortedEmployees) {

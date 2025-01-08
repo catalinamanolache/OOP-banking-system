@@ -30,6 +30,7 @@ public abstract class Account {
     private Map<Commerciant, Integer> nrOfTransactions;
     private Map<Commerciant.CommerciantType, Double> nrOfTransactionsCashback;
     private Map<Commerciant, Double> spendingThresholdCashback;
+    private double spendingThresholdTotal;
 
     public Account(final String currency, final AccountType accountType, final User owner) {
         this.balance = 0;
@@ -44,14 +45,7 @@ public abstract class Account {
         this.nrOfTransactions = new HashMap<>();
         this.nrOfTransactionsCashback = new HashMap<>();
         this.spendingThresholdCashback = new HashMap<>();
-    }
-
-    /**
-     * Round the balance to 2 decimal places.
-     */
-    public void roundBalance() {
-        String balanceString = String.format("%.2f", this.balance);
-        this.balance = Double.parseDouble(balanceString);
+        this.spendingThresholdTotal = 0;
     }
 
     /**
@@ -83,7 +77,6 @@ public abstract class Account {
      */
     public void updateTotalSpent(final Commerciant commerciant, final double amount,
                                  final String currencyString) {
-//        System.out.println("commerciant " + commerciant.getCommerciant());
         double amountConverted = CurrencyConverter.convert(currencyString, "RON", amount);
         if (this.totalSpent.containsKey(commerciant)) {
             double newAmount = this.totalSpent.get(commerciant) + amountConverted;
@@ -105,7 +98,6 @@ public abstract class Account {
         } else {
             this.nrOfTransactions.put(commerciant, 1);
         }
-        System.out.println("nr of transactions " + this.nrOfTransactions.get(commerciant));
     }
 
     /**
@@ -114,7 +106,6 @@ public abstract class Account {
      */
     public void deposit(final double amount) {
         balance += amount;
-        roundBalance();
     }
 
     /**
@@ -123,7 +114,6 @@ public abstract class Account {
      */
     public void withdraw(final double amount) {
         balance -= amount;
-        roundBalance();
     }
 
     /**
@@ -332,5 +322,13 @@ public abstract class Account {
      */
     public void setSpendingThresholdCashback(final Map<Commerciant, Double> map) {
         this.spendingThresholdCashback = map;
+    }
+
+    public double getSpendingThresholdTotal() {
+        return spendingThresholdTotal;
+    }
+
+    public void setSpendingThresholdTotal(double spendingThresholdTotal) {
+        this.spendingThresholdTotal = spendingThresholdTotal;
     }
 }

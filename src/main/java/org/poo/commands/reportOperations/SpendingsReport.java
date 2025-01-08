@@ -62,9 +62,7 @@ public class SpendingsReport implements Command {
 
         outputNode.put("IBAN", account.getIban());
 
-        String formatted = String.format("%.2f", account.getBalance());
-        double formattedBalance = Double.parseDouble(formatted);
-        outputNode.put("balance", formattedBalance);
+        outputNode.put("balance", account.getBalance());
 
         outputNode.put("currency", account.getCurrency());
 

@@ -9,7 +9,11 @@ import java.util.Map;
 public class CashbackContext {
     private final CashbackStrategy strategy;
 
-    public CashbackContext(String strategy) {
+    /**
+     * Constructor for the CashbackContext class.
+     * @param strategy the cashback strategy to be used
+     */
+    public CashbackContext(final String strategy) {
         switch (strategy) {
             case "nrOfTransactions":
                 this.strategy = new NrOfTransactions();
@@ -23,34 +27,66 @@ public class CashbackContext {
         }
     }
 
-    public void calculateFutureCashback(Account account, User user, Commerciant commerciant) {
+    /**
+     * Calculate the cashback for a user.
+     * @param account the account
+     * @param user the user
+     * @param commerciant the commerciant at which the user is paying
+     */
+    public void calculateCashback(final Account account, final User user,
+                                        final Commerciant commerciant) {
         this.strategy.calculateCashback(account, user, commerciant);
     }
 
-    // TODO: incasare cashback ca metode pt fiecare implementare
-    public void useDiscountCashback(User user, Account account, Commerciant commerciant, double amount) {
-        for (Map.Entry<Commerciant.CommerciantType, Double> entry : account.getNrOfTransactionsCashback().entrySet()) {
+    /**
+     * Use the discount for the nrOfTransactions type of cashback before the current transaction
+     * is processed.
+     * @param user the user
+     * @param account the account
+     * @param commerciant the commerciant
+     * @param amount the amount of the current transaction
+     */
+    public void useDiscount(final User user, final Account account,
+                                    final Commerciant commerciant, double amount) {
+        // go through the types of discount and apply the one that matches the commerciant's type
+        for (Map.Entry<Commerciant.CommerciantType, Double> entry
+                : account.getNrOfTransactionsCashback().entrySet()) {
             if (entry.getKey().equals(Commerciant.CommerciantType.valueOf(commerciant.getType()))) {
+                // deposit the cashback in the account
                 double cashback = entry.getValue();
-                account.getNrOfTransactionsCashback().remove(entry.getKey());
-                System.out.println("will get discount for " +commerciant.getType() + " balance before " + account.getBalance());
                 account.deposit(amount * cashback);
-                System.out.println("Deposited cashback " + amount * cashback + account.getCurrency() + " user " + user.getEmail());
-                System.out.println("Balance after and before commision " + account.getBalance());
+
+                System.out.println("used nrOfTransactions discount " + (amount * cashback) + " account " + account.getIban() + " user " + user.getEmail());
+                // remove the discount from the account
+                account.getNrOfTransactionsCashback().remove(entry.getKey());
                 break;
             }
         }
     }
 
-    public void useCashback(Account account, Commerciant commerciant, double amount) {
+    /**
+     * Use the discount for the spendingThreshold type of cashback after the current transaction.
+     * @param account the account
+     * @param commerciant the commerciant
+     * @param amount the amount of the current transaction
+     */
+    public void useCashback(final Account account, final Commerciant commerciant, double amount) {
        Map<Commerciant, Double> spendingThresholdCashback = account.getSpendingThresholdCashback();
+
        if (!spendingThresholdCashback.containsKey(commerciant)) {
            return;
        }
+
+       // get the cashback percentage for the commerciant based on the total spent
        double cashback = spendingThresholdCashback.get(commerciant);
-       System.out.println("discount spending treshold balance before " + account.getBalance());
+//        double cashback = account.getSpendingThresholdTotal();
+        System.out.println("cashback variable " + cashback);
+//       System.out.println("discount spending treshold balance before " + account.getBalance());
+//        System.out.println("amount " + amount + " cashback " + cashback);
        account.deposit(amount * cashback);
-       System.out.println("Deposited cashback " + amount * cashback + account.getCurrency());
-       System.out.println("Balance after and before commision " + account.getBalance());
+//       spendingThresholdCashback.remove(commerciant);
+//       System.out.println("Deposited cashback " + amount * cashback + account.getCurrency());
+//       System.out.println("Balance after and before commision " + account.getBalance());
+        System.out.println("used spendingThreshold discount " + (amount * cashback) + " account " + account.getIban());
     }
 }

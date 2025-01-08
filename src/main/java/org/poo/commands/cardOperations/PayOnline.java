@@ -16,6 +16,8 @@ import org.poo.instances.Commerciant;
 import org.poo.instances.Plan;
 import org.poo.instances.User;
 
+import java.util.Map;
+
 public class PayOnline implements Command {
     private CommandData command;
     private Bank bank;
@@ -118,13 +120,14 @@ public class PayOnline implements Command {
 
             card.pay(amountConverted + commission);
 
+            System.out.println("payOnline balance before " + account.getBalance());
 //                System.out.print(this.command.getCommand() + " | took commission " + commission + " for email " + email +
 //                        " timestamp " + timestamp);
 //                System.out.print(" | new balance " + account.getBalance() + "\n");
 
 
             // get the cashback discount benefit if the user reached the milestones for nrOfTransactions
-            cashbackContext.useDiscountCashback(user, account, commerciant, amountConverted);
+            cashbackContext.useDiscount(user, account, commerciant, amountConverted);
 
             // update the total spent for the commerciant
             account.updateTotalSpent(commerciant, amount, currency);
@@ -133,7 +136,7 @@ public class PayOnline implements Command {
             account.updateNrOfTransactions(commerciant);
 
             // calculate the future cashback for the sender
-            cashbackContext.calculateFutureCashback(account, user, commerciant);
+            cashbackContext.calculateCashback(account, user, commerciant);
 
             // get the cashback benefit for spending threshold
             cashbackContext.useCashback(account, commerciant, amountConverted);
@@ -152,11 +155,32 @@ public class PayOnline implements Command {
 
             // check if the user can upgrade its plan from silver to gold automatically
             if (user.getPlanType().equals(Plan.PlanType.SILVER)) {
-                Plan.checkIfCanUpgrade(user);
+                if(Plan.checkIfCanUpgrade(user)) {
+                    // add an upgrade transaction to the account
+                    transaction = new Transaction.TransactionBuilder(timestamp,
+                            "Upgrade plan", "upgradePlan")
+                            .newPlanType(Plan.PlanType.GOLD.toString().toLowerCase())
+                            .account(account.getIban())
+                            .build();
+                    account.addTransaction(transaction);
+                    System.out.println("user " + user.getEmail() + " upgraded from silver to gold");
+//                    for (Map.Entry<Commerciant, Double> cashback : account.getSpendingThresholdCashback().entrySet()) {
+//                        System.out.println("Commerciant " + cashback.getKey().getCommerciant() + " cashback percentage " + cashback.getValue());
+//                        double totalSpent = account.getTotalSpent().get(cashback.getKey());
+//                        if (totalSpent >= 100 && totalSpent < 300) {
+//                            account.getSpendingThresholdCashback().put(cashback.getKey(), 0.005);
+//                        } else if (totalSpent >= 300 && totalSpent < 500) {
+//                            account.getSpendingThresholdCashback().put(cashback.getKey(), 0.0055);
+//                        } else if (totalSpent >= 500) {
+//                            account.getSpendingThresholdCashback().put(cashback.getKey(), 0.007);
+//                        }
+//                        System.out.println("Commerciant " + cashback.getKey().getCommerciant() + " new cashback percentage " + cashback.getValue());
+//                    }
+                }
             }
 
-//            System.out.println("timestamp " + timestamp + " Paid " + amount + " commision " + commission + " to " + commerciantString + " with card " +
-//                    cardNumber + " from account " + account.getIban()+ " with balance " + account.getBalance() + " and plan " + user.getPlanType());
+            System.out.println("timestamp " + timestamp + " Paid " + amount + " currency amount " + amountConverted + account.getCurrency() + " commision " + commission + " to " + commerciantString + " with card " +
+                    cardNumber + " from account " + account.getIban()+ " with balance " + account.getBalance() + " and plan " + account.getOwner().getPlanType());
 
         } else {
             // if the account doesn't have enough money, add an error transaction
