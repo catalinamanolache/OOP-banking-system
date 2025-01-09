@@ -39,6 +39,8 @@ public class SendMoney implements Command {
         int timestamp = this.command.getTimestamp();
         String email = this.command.getEmail();
 
+
+
         // get the sender and receiver accounts and the alias map
         Account senderAccount;
         Account receiverAccount;
@@ -56,6 +58,7 @@ public class SendMoney implements Command {
         } else {
             receiverAccount = this.bank.getAccountByIban(receiverIban);
         }
+
 
         boolean isReceiverCommerciant = false;
 
@@ -98,14 +101,14 @@ public class SendMoney implements Command {
         User senderUser = this.bank.getUserByEmail(email);
 
         double commission;
-//        if (senderAccount.getAccountType().equals(Account.AccountType.BUSINESS)) {
-//            // if the sender is a business account, get the commission from the owner's plan
-//            commission = Plan.getCommission(senderAccount.getOwner().getPlanType(), amount,
-//                    senderAccount.getCurrency());
-//        } else {
+        if (senderAccount.getAccountType().equals(Account.AccountType.BUSINESS)) {
+            // if the sender is a business account, get the commission from the owner's plan
+            commission = Plan.getCommission(senderAccount.getOwner().getPlanType(), amount,
+                    senderAccount.getCurrency());
+        } else {
             commission = Plan.getCommission(senderUser.getPlanType(), amount,
                     senderAccount.getCurrency());
-//        }
+        }
 
         Commerciant commerciant = this.bank.getCommerciantByIban(receiverIban);
 
@@ -113,6 +116,12 @@ public class SendMoney implements Command {
         // for a personal account, this is always true
         boolean canPay
                 = senderAccount.handleMoneyTransactions(senderUser, -convertedAmount, commerciant);
+
+        if (senderAccount.getIban().equals("RO68POOB1848616931405475") && !isReceiverCommerciant) {
+            System.out.println("sendMoney timestamp " + timestamp + "  " + email + " sent " + amount + " " + senderAccount.getCurrency() +
+                    " to " + receiverAccount + " and paid a commission of " + commission + " " +
+                    senderAccount.getCurrency() + " sender plan " + senderUser.getPlanType() + " balance " + senderAccount.getBalance());
+        }
 
         // check if the sender has enough funds and if not, add an error transaction to the sender
         if (senderAccount.getBalance() < amount + commission) {
@@ -139,6 +148,7 @@ public class SendMoney implements Command {
 
             // if the receiver is a commerciant, calculate the cashback for this transaction
             if (isReceiverCommerciant) {
+                System.out.println("balance before cashback " + senderAccount.getBalance());
                 CashbackContext cashbackContext =
                         new CashbackContext(commerciant.getCashbackStrategy());
 
@@ -146,7 +156,7 @@ public class SendMoney implements Command {
 
                 // get the cashback discount benefit for nrOfTransactions
                 cashbackContext.useDiscount(senderUser, senderAccount,
-                        commerciant, convertedAmount);
+                        commerciant, amount);
 
                 // update the total spent for the commerciant
                 senderAccount.updateTotalSpent(commerciant, amount, currency);
@@ -157,14 +167,23 @@ public class SendMoney implements Command {
                 // calculate the future cashback for the sender
                 cashbackContext.calculateCashback(senderAccount, senderUser, commerciant);
 
-//                // get the cashback benefit for spending threshold
-                cashbackContext.useCashback(senderAccount, commerciant, convertedAmount);
+                // get the cashback benefit for spending threshold
+                cashbackContext.useCashback(senderAccount, commerciant, amount);
 
                 // check if the user can upgrade its plan from silver to gold automatically
                 if (senderUser.getPlanType().equals(Plan.PlanType.SILVER)) {
                     Plan.checkIfCanUpgrade(senderUser);
                 }
+
+                System.out.println("balance after cashback " + senderAccount.getBalance());
+                if (senderAccount.getIban().equals("RO68POOB1848616931405475")) {
+                    System.out.println("COMERCIANT sendMoney timestamp " + timestamp + "  " + email + " sent " + amount + " " + senderAccount.getCurrency() +
+                            " to " + receiverAccount + " and paid a commission of " + commission + " " +
+                            senderAccount.getCurrency() + " sender plan " + senderUser.getPlanType() + " balance " + senderAccount.getBalance());
+                }
             }
+
+
 
             // add the transactions to the sender and receiver
             Transaction transactionSender;

@@ -92,6 +92,16 @@ public class CashWithdrawal implements Command {
         // take the commission depending on the user's plan
         double commission = Plan.getCommission(user.getPlanType(), amountConverted,
                 account.getCurrency());
+//        double commission;
+//        if (account.getAccountType().equals(Account.AccountType.BUSINESS)) {
+//            // if the sender is a business account, get the commission from the owner's plan
+//            commission = Plan.getCommission(account.getOwner().getPlanType(), amount,
+//                    account.getCurrency());
+//        } else {
+//            commission = Plan.getCommission(user.getPlanType(), amount,
+//                    account.getCurrency());
+//        }
+
 
         // if the user doesn't have enough funds, print an error
         if (amountConverted + commission > account.getBalance()) {

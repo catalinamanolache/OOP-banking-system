@@ -28,13 +28,19 @@ public class NrOfTransactions implements CashbackStrategy {
 
         // for each number of transactions, set the cashback percentage for the commerciant
         if (nrOfTransactions == 2) {
-            cashbackMap.put(Commerciant.CommerciantType.Food, 0.02);
+            if (!cashbackMap.containsKey(Commerciant.CommerciantType.Food)) {
+                cashbackMap.put(Commerciant.CommerciantType.Food, 0.02);
+            }
             System.out.println("after paying at " + commerciant.getCommerciant() + " " + user.getEmail() + " will get cashback for food");
         } else if (nrOfTransactions == 5) {
-            cashbackMap.put(Commerciant.CommerciantType.Clothes, 0.05);
+            if (!cashbackMap.containsKey(Commerciant.CommerciantType.Clothes)) {
+                cashbackMap.put(Commerciant.CommerciantType.Clothes, 0.05);
+            }
             System.out.println("after paying at " + commerciant.getCommerciant() + " " + user.getEmail() + " will get cashback for clothes");
         } else if (nrOfTransactions == 10) {
-            cashbackMap.put(Commerciant.CommerciantType.Tech, 0.1);
+            if (!cashbackMap.containsKey(Commerciant.CommerciantType.Tech)) {
+                cashbackMap.put(Commerciant.CommerciantType.Tech, 0.1);
+            }
             System.out.println("after paying at " + commerciant.getCommerciant() + " " + user.getEmail() + " will get cashback for tech");
         }
     }

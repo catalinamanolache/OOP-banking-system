@@ -62,7 +62,7 @@ public final class Plan {
                 return SILVER_TO_GOLD_FEE;
             }
         }
-        return -1;
+        return 0;
     }
 
     /**
@@ -72,7 +72,14 @@ public final class Plan {
      * @return true if the user tries to downgrade, false otherwise
      */
     public static boolean checkIfDowngrade(Plan.PlanType currentPlan, Plan.PlanType newPlan) {
-        return currentPlan.compareTo(newPlan) > 0;
+        if (currentPlan.equals(PlanType.STANDARD) && newPlan.equals(PlanType.STUDENT)) {
+            return false;
+        } else if (currentPlan.equals(PlanType.STUDENT) && newPlan.equals(PlanType.STANDARD)) {
+            return false;
+        } else {
+            return currentPlan.compareTo(newPlan) > 0;
+
+        }
     }
 
     /**
@@ -92,7 +99,8 @@ public final class Plan {
         for (Account userAccount : user.getAccounts()) {
             for (Transaction transaction : userAccount.getTransactions()) {
                 if (transaction.getTransactionType().equals("payOnline")
-                        || transaction.getTransactionType().equals("sendMoney")) {
+                        || (transaction.getTransactionType().equals("sendMoney")
+                        && transaction.getReceiverIBAN() != null)) {
                     double amount = transaction.getAmount();
                     double amountConverted = CurrencyConverter.convert(userAccount.getCurrency(),
                             "RON", amount);

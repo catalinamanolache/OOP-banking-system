@@ -55,10 +55,9 @@ public class CashbackContext {
                 // deposit the cashback in the account
                 double cashback = entry.getValue();
                 account.deposit(amount * cashback);
-
-                System.out.println("used nrOfTransactions discount " + (amount * cashback) + " account " + account.getIban() + " user " + user.getEmail());
+                System.out.println("used nrOfTransactions discount " + (amount * cashback) + " cashback " + cashback + " account " + account.getIban() + " user " + user.getEmail());
                 // remove the discount from the account
-                account.getNrOfTransactionsCashback().remove(entry.getKey());
+                account.getNrOfTransactionsCashback().put(entry.getKey(), 0.0);
                 break;
             }
         }
@@ -83,7 +82,9 @@ public class CashbackContext {
         System.out.println("cashback variable " + cashback);
 //       System.out.println("discount spending treshold balance before " + account.getBalance());
 //        System.out.println("amount " + amount + " cashback " + cashback);
-       account.deposit(amount * cashback);
+        account.deposit(amount * cashback);
+
+
 //       spendingThresholdCashback.remove(commerciant);
 //       System.out.println("Deposited cashback " + amount * cashback + account.getCurrency());
 //       System.out.println("Balance after and before commision " + account.getBalance());

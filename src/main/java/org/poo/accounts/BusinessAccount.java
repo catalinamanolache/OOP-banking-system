@@ -19,6 +19,7 @@ public class BusinessAccount extends Account {
 
     private Map<UserType, List<User>> userMap;
     private Map<User, Map<Commerciant, Double>> totalSpentBusiness;
+    private Map<User, Map<Commerciant, Integer>> nrOfTransactionsBusiness;
     private Map<User, Double> totalDeposited;
 
     private double spendingLimit;
@@ -31,8 +32,11 @@ public class BusinessAccount extends Account {
         this.userMap.put(UserType.EMPLOYEE, new ArrayList<>());
         this.totalSpentBusiness = new HashMap<>();
         this.totalDeposited = new HashMap<>();
-        this.spendingLimit = CurrencyConverter.convert("RON", currency, INITIAL_BUSINESS_LIMIT);
-        this.depositLimit = CurrencyConverter.convert("RON", currency, INITIAL_BUSINESS_LIMIT);
+        this.nrOfTransactionsBusiness = new HashMap<>();
+        this.spendingLimit = CurrencyConverter.convert("RON", currency,
+                INITIAL_BUSINESS_LIMIT);
+        this.depositLimit = CurrencyConverter.convert("RON", currency,
+                INITIAL_BUSINESS_LIMIT);
     }
 
     /**
@@ -66,6 +70,8 @@ public class BusinessAccount extends Account {
             // add the amount to the total spent of the user, if the user has already spent money
             if (this.totalSpentBusiness.containsKey(user)) {
                 Map<Commerciant, Double> spentMap = this.totalSpentBusiness.get(user);
+                Map<Commerciant, Integer> nrOfTransactionsMap
+                        = this.nrOfTransactionsBusiness.get(user);
 
                 // if the user has already spent money at this commerciant, add the amount to it
                 if (spentMap.containsKey(commerciant)) {
@@ -74,12 +80,22 @@ public class BusinessAccount extends Account {
                     // create a new entry for the commerciant and add the amount to it
                     spentMap.put(commerciant, localAmount);
                 }
+
+                if (nrOfTransactionsMap.containsKey(commerciant)) {
+                    nrOfTransactionsMap.put(commerciant, nrOfTransactionsMap.get(commerciant) + 1);
+                } else {
+                    nrOfTransactionsMap.put(commerciant, 1);
+                }
                 System.out.println("spent " + localAmount + " in business account");
             } else {
                 // create a new map for the user and add the amount to it
                 Map<Commerciant, Double> spentMap = new HashMap<>();
                 spentMap.put(commerciant, localAmount);
                 this.totalSpentBusiness.put(user, spentMap);
+
+                Map<Commerciant, Integer> nrOfTransactionsMap = new HashMap<>();
+                nrOfTransactionsMap.put(commerciant, 1);
+                this.nrOfTransactionsBusiness.put(user, nrOfTransactionsMap);
                 System.out.println("spent " + localAmount + " in business account");
             }
         } else {
@@ -326,5 +342,13 @@ public class BusinessAccount extends Account {
      */
     public void setTotalDeposited(final Map<User, Double> totalDeposited) {
         this.totalDeposited = totalDeposited;
+    }
+
+    public Map<User, Map<Commerciant, Integer>> getNrOfTransactionsBusiness() {
+        return nrOfTransactionsBusiness;
+    }
+
+    public void setNrOfTransactionsBusiness(Map<User, Map<Commerciant, Integer>> nrOfTransactionsBusiness) {
+        this.nrOfTransactionsBusiness = nrOfTransactionsBusiness;
     }
 }

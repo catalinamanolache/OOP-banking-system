@@ -94,7 +94,7 @@ public class UpgradePlan implements Command {
                     .error("insufficient funds")
                     .build();
             account.addTransaction(transaction);
-            System.out.println("Insufficient funds in upgrade plan");
+            System.out.println("Insufficient funds in upgrade plan user " + user.getEmail() + " account " + account.getIban() + " timestamp " + timestamp + " needed " + convertedFee + account.getCurrency());
             return;
         }
 
@@ -112,6 +112,6 @@ public class UpgradePlan implements Command {
         account.addTransaction(transaction);
 
         System.out.println("user " + user.getEmail() + " upgraded from " + oldPlanType.name().toLowerCase()
-                + " to " + newPlanType.name().toLowerCase() + " paid " + fee + " RON" + " converted fee " + convertedFee + account.getCurrency());
+                + " to " + newPlanType.name().toLowerCase() + " paid " + fee + " RON" + " converted fee " + convertedFee + account.getCurrency() + " timestamp " + timestamp);
     }
 }
