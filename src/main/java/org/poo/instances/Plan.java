@@ -100,13 +100,14 @@ public final class Plan {
             for (Transaction transaction : userAccount.getTransactions()) {
                 if (transaction.getTransactionType().equals("payOnline")
                         || (transaction.getTransactionType().equals("sendMoney")
-                        && transaction.getReceiverIBAN() != null)) {
+                        && transaction.getCommerciant() != null)) {
                     double amount = transaction.getAmount();
                     double amountConverted = CurrencyConverter.convert(userAccount.getCurrency(),
                             "RON", amount);
 
                     if (amountConverted >= AUTO_UPGRADE_THRESHOLD) {
                         validTransactionsCount++;
+                        System.out.println("transaction " + transaction.getTimestamp() + " " + transaction.getAmount() + " " + transaction.getCommerciant());
                     }
 
                     // if the user has at least 5 transactions greater than 300 RON, he can upgrade

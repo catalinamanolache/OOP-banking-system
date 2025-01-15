@@ -57,7 +57,13 @@ public class DeleteCard implements Command {
                 .build();
         account.addTransaction(transaction);
 
+
+        boolean canDelete = account.handleDeleteCard(cardToDelete, user);
+
+        System.out.println("delet card timestamp " + timestamp + " balance " + account.getBalance() + " card" + cardNumber);
         // remove the card from the account
-        account.getCards().remove(cardToDelete);
+        if (account.getBalance() <= 0 && canDelete && !account.getAccountType().equals(Account.AccountType.CLASSIC)) {
+            account.getCards().remove(cardToDelete);
+        }
     }
 }

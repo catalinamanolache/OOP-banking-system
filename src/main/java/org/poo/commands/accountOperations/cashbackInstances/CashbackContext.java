@@ -76,9 +76,15 @@ public class CashbackContext {
            return;
        }
 
+//        if (!account.getNrOfTransactions().containsKey(commerciant)) {
+//            return;
+//        }
+//       if (account.getSpendingThresholdTotal() == 0) {
+//           return;
+//       }
        // get the cashback percentage for the commerciant based on the total spent
-       double cashback = spendingThresholdCashback.get(commerciant);
-//        double cashback = account.getSpendingThresholdTotal();
+//       double cashback = spendingThresholdCashback.get(commerciant);
+        double cashback = account.getSpendingThresholdTotal();
         System.out.println("cashback variable " + cashback);
 //       System.out.println("discount spending treshold balance before " + account.getBalance());
 //        System.out.println("amount " + amount + " cashback " + cashback);

@@ -6,13 +6,21 @@
   <component name="ChangeListManager">
     <list default="true" id="36189c1d-567c-4522-9e71-01d5fd80ea68" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test14_more_business.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test14_more_business.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test18_large_input_part1.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test18_large_input_part1.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test19_large_input_part2.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test19_large_input_part2.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ref/ref_test20_large_input_part3.json" beforeDir="false" afterPath="$PROJECT_DIR$/ref/ref_test20_large_input_part3.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/accounts/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/accounts/Account.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/accounts/BusinessAccount.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/accounts/BusinessAccount.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/checker/CheckerConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/checker/CheckerConstants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/AddFunds.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/AddFunds.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/SendMoney.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/SendMoney.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/UpgradePlan.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/UpgradePlan.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/CashbackContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/CashbackContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/NrOfTransactions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/NrOfTransactions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/SpendingThreshold.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/accountOperations/cashbackInstances/SpendingThreshold.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/CashWithdrawal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/CashWithdrawal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/DeleteCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/DeleteCard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/PayOnline.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/cardOperations/PayOnline.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/commands/reportOperations/BusinessReport.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/commands/reportOperations/BusinessReport.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/poo/instances/Plan.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/poo/instances/Plan.java" afterDir="false" />
     </list>
@@ -51,7 +59,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="Application.Test">
+  <component name="RunManager" selected="Application.Main">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.poo.main.Main" />
       <module name="j-poo-morgan-phase-two" />
@@ -91,8 +99,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Test" />
         <item itemvalue="Application.Main" />
+        <item itemvalue="Application.Test" />
       </list>
     </recent_temporary>
   </component>
@@ -124,7 +132,21 @@
       <workItem from="1736417997761" duration="2551000" />
       <workItem from="1736426258748" duration="100000" />
       <workItem from="1736445765894" duration="600000" />
-      <workItem from="1736450282676" duration="3429000" />
+      <workItem from="1736450282676" duration="6043000" />
+      <workItem from="1736459096198" duration="702000" />
+      <workItem from="1736464891800" duration="129000" />
+      <workItem from="1736500398179" duration="4250000" />
+      <workItem from="1736504901407" duration="426000" />
+      <workItem from="1736505343355" duration="42000" />
+      <workItem from="1736511529519" duration="338000" />
+      <workItem from="1736544933888" duration="892000" />
+      <workItem from="1736584382826" duration="486000" />
+      <workItem from="1736585078773" duration="1926000" />
+      <workItem from="1736598731373" duration="123000" />
+      <workItem from="1736802525592" duration="6000" />
+      <workItem from="1736936275451" duration="3235000" />
+      <workItem from="1736940110296" duration="42000" />
+      <workItem from="1736940934205" duration="787000" />
     </task>
     <servers />
   </component>

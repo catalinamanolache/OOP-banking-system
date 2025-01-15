@@ -33,7 +33,7 @@ public class SpendingThreshold implements CashbackStrategy {
 //        System.out.println("user plan type " + user.getPlanType() + " owner plan type " + account.getOwner().getPlanType());
 
         for (Map.Entry<Commerciant, Double> entry : cashbackMap.entrySet()) {
-            System.out.println("cashbackMap " + entry.getKey().getCommerciant() + " " + entry.getValue());
+//            System.out.println("cashbackMap " + entry.getKey().getCommerciant() + " " + entry.getValue());
         }
         
 //        double totalSpent = totalSpentMap.get(commerciant);

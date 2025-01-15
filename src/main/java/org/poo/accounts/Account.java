@@ -55,10 +55,14 @@ public abstract class Account {
      * @param commerciant the commerciant receiving the transaction
      * @return true if the transaction was successful, false otherwise
      */
-    public boolean handleMoneyTransactions(final User user, final double amount,
-                                           final Commerciant commerciant) {
+    public boolean verifyMoneyTransaction(final User user, final double amount,
+                                          final Commerciant commerciant) {
         return true;
     }
+
+    public void handleMoneyTransactions(final User user, final double amount,
+                                        final Commerciant commerciant) {}
+
 
     /**
      * Handle card transactions between the user and a card.
@@ -67,6 +71,10 @@ public abstract class Account {
      * @return true if the transaction was successful, false otherwise
      */
     public boolean handleCardTransactions(final Card card, final User user) {
+        return true;
+    }
+
+    public boolean handleDeleteCard(final Card card, final User user) {
         return true;
     }
 

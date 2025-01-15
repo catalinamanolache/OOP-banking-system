@@ -100,22 +100,20 @@ public class SendMoney implements Command {
         // compute the commission depending on the sender user's plan
         User senderUser = this.bank.getUserByEmail(email);
 
-        double commission;
+        Plan.PlanType userPlan = senderUser.getPlanType();
         if (senderAccount.getAccountType().equals(Account.AccountType.BUSINESS)) {
-            // if the sender is a business account, get the commission from the owner's plan
-            commission = Plan.getCommission(senderAccount.getOwner().getPlanType(), amount,
-                    senderAccount.getCurrency());
-        } else {
-            commission = Plan.getCommission(senderUser.getPlanType(), amount,
-                    senderAccount.getCurrency());
+            userPlan = senderAccount.getOwner().getPlanType();
         }
+        double commission;
+        commission = Plan.getCommission(userPlan, amount,
+                    senderAccount.getCurrency());
 
         Commerciant commerciant = this.bank.getCommerciantByIban(receiverIban);
 
         // for a business account, check if the user spends in the limit of the account
         // for a personal account, this is always true
         boolean canPay
-                = senderAccount.handleMoneyTransactions(senderUser, -convertedAmount, commerciant);
+                = senderAccount.verifyMoneyTransaction(senderUser, -convertedAmount, commerciant);
 
         if (senderAccount.getIban().equals("RO68POOB1848616931405475") && !isReceiverCommerciant) {
             System.out.println("sendMoney timestamp " + timestamp + "  " + email + " sent " + amount + " " + senderAccount.getCurrency() +
@@ -138,6 +136,8 @@ public class SendMoney implements Command {
             if (!isReceiverCommerciant) {
                 receiverAccount.deposit(convertedAmount);
             }
+
+            senderAccount.handleMoneyTransactions(senderUser, -convertedAmount, commerciant);
 
 //            System.out.print(this.command.getCommand() + " | took commission " + commission + " for email " + email +
 //                    " timestamp " + timestamp);
@@ -171,7 +171,7 @@ public class SendMoney implements Command {
                 cashbackContext.useCashback(senderAccount, commerciant, amount);
 
                 // check if the user can upgrade its plan from silver to gold automatically
-                if (senderUser.getPlanType().equals(Plan.PlanType.SILVER)) {
+                if (senderAccount.equals(Plan.PlanType.SILVER)) {
                     Plan.checkIfCanUpgrade(senderUser);
                 }
 
@@ -194,6 +194,7 @@ public class SendMoney implements Command {
                     .amount(amount)
                     .currency(senderAccount.getCurrency())
                     .transferType("sent")
+                    .commerciant(receiverAccount != null ? receiverAccount.getOwner().getEmail() : null)
                     .build();
             senderAccount.addTransaction(transactionSender);
 

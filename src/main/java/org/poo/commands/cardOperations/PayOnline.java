@@ -16,8 +16,6 @@ import org.poo.instances.Commerciant;
 import org.poo.instances.Plan;
 import org.poo.instances.User;
 
-import java.util.Map;
-
 public class PayOnline implements Command {
     private CommandData command;
     private Bank bank;
@@ -62,9 +60,11 @@ public class PayOnline implements Command {
                 BusinessAccount businessAccount = (BusinessAccount) account;
                 if (!businessAccount.isUserAssociatedWithBusiness(user)) {
                     card = null;
+                    System.out.println("user " + user.getEmail() + " is not associated with business " + account.getIban() + " timestamp " + timestamp);
                 }
             } else if (!account.getOwner().getEmail().equals(email)) {
                 card = null;
+                System.out.println("user " + user.getEmail() + " is not the owner of account " + account.getIban() + " timestamp " + timestamp);
             }
         }
 
@@ -102,8 +102,12 @@ public class PayOnline implements Command {
         double amountConverted = CurrencyConverter.convert(currency,
                 card.getParentAccount().getCurrency(), amount);
 
+        Plan.PlanType userPlan = user.getPlanType();
+        if (account.getAccountType().equals(Account.AccountType.BUSINESS)) {
+            userPlan = account.getOwner().getPlanType();
+        }
         // take the commission depending on the user's plan
-        double commission = Plan.getCommission(user.getPlanType(), amountConverted,
+        double commission = Plan.getCommission(userPlan, amountConverted,
                 account.getCurrency());
 
         Commerciant commerciant = this.bank.getCommerciantByName(commerciantString);
@@ -111,16 +115,21 @@ public class PayOnline implements Command {
 //            System.out.println("trying to pay amount " + amount + " amountConverted "
 //                    + amountConverted + " commission " + commission + " balance" + card.getParentAccount().getBalance());
         // check if the account has enough money and pay
-        boolean canPay = account.handleMoneyTransactions(user, -amountConverted, commerciant);
+        boolean canPay = account.verifyMoneyTransaction(user, -amountConverted, commerciant);
 
+        System.out.println("commerciant is null? " + (commerciant == null) + " balance " + account.getBalance() + " canPay " + canPay + " amountConverted " + amountConverted + " commission " + commission);
         if (card.getParentAccount().getBalance() >= amountConverted + commission && canPay
                 && commerciant != null) {
+            System.out.println("timestamp " + timestamp + " " + user.getEmail() + " Paid " + amount + " currency amount " + amountConverted + account.getCurrency() + " commision " + commission + " to " + commerciantString + " with card " +
+                    cardNumber + " from account " + account.getIban() + " with balance " + account.getBalance() + " and plan " + account.getOwner().getPlanType());
             CashbackContext cashbackContext =
                     new CashbackContext(commerciant.getCashbackStrategy());
 
             card.pay(amountConverted + commission);
 
-            System.out.println("payOnline balance before " + account.getBalance());
+            account.handleMoneyTransactions(user, -amountConverted, commerciant);
+
+//            System.out.println("payOnline balance before " + account.getBalance());
 //                System.out.print(this.command.getCommand() + " | took commission " + commission + " for email " + email +
 //                        " timestamp " + timestamp);
 //                System.out.print(" | new balance " + account.getBalance() + "\n");
@@ -154,7 +163,8 @@ public class PayOnline implements Command {
                     cardNumber, card.getCardNumber(), account, email);
 
             // check if the user can upgrade its plan from silver to gold automatically
-            if (user.getPlanType().equals(Plan.PlanType.SILVER)) {
+
+            if (userPlan.equals(Plan.PlanType.SILVER)) {
                 if(Plan.checkIfCanUpgrade(user)) {
                     // add an upgrade transaction to the account
                     transaction = new Transaction.TransactionBuilder(timestamp,
@@ -163,7 +173,7 @@ public class PayOnline implements Command {
                             .account(account.getIban())
                             .build();
                     account.addTransaction(transaction);
-                    System.out.println("user " + user.getEmail() + " upgraded from silver to gold");
+                    System.out.println("user " + user.getEmail() + " upgraded from silver to gold timestamp " + timestamp);
 //                    for (Map.Entry<Commerciant, Double> cashback : account.getSpendingThresholdCashback().entrySet()) {
 //                        System.out.println("Commerciant " + cashback.getKey().getCommerciant() + " cashback percentage " + cashback.getValue());
 //                        double totalSpent = account.getTotalSpent().get(cashback.getKey());
@@ -178,9 +188,6 @@ public class PayOnline implements Command {
 //                    }
                 }
             }
-
-            System.out.println("timestamp " + timestamp + " Paid " + amount + " currency amount " + amountConverted + account.getCurrency() + " commision " + commission + " to " + commerciantString + " with card " +
-                    cardNumber + " from account " + account.getIban()+ " with balance " + account.getBalance() + " and plan " + account.getOwner().getPlanType());
 
         } else {
             // if the account doesn't have enough money, add an error transaction

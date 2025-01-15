@@ -66,8 +66,11 @@ public class BusinessReport implements Command {
         report.put("deposit limit", depositLimit);
 
         if (type.equals("transaction")) {
-            List<User> managers = businessAccount.getUserMap().get(BusinessAccount.UserType.MANAGER);
-            List<User> employees = businessAccount.getUserMap().get(BusinessAccount.UserType.EMPLOYEE);
+            List<User> managers = businessAccount.getUserMap()
+                    .get(BusinessAccount.UserType.MANAGER);
+            List<User> employees = businessAccount.getUserMap()
+                    .get(BusinessAccount.UserType.EMPLOYEE);
+
             double totalSpent = 0;
             double totalDeposited = 0;
 
@@ -145,7 +148,6 @@ public class BusinessReport implements Command {
                 List<String> sortedEmployees = new ArrayList<>();
                 List<String> sortedManagers = new ArrayList<>();
 
-
                 for (User user : usersWhoSpentAtCommerciant) {
                     BusinessAccount.UserType userType = businessAccount.getUserType(user);
                     Map<Commerciant, Integer> nrOfTransactionsMap
@@ -165,9 +167,8 @@ public class BusinessReport implements Command {
                             sortedManagers.add(name);
                         }
                     }
-                    double totalSpentAtCommerciant = businessAccount.getTotalSpentAtCommerciantByUser(commerciant, user);
-                    System.out.println("total spent at commerciant: " + totalSpentAtCommerciant + " commerciant name: " + commerciant.getCommerciant() + " users who spent: " + usersWhoSpentAtCommerciant);
-
+                    double totalSpentAtCommerciant
+                            = businessAccount.getTotalSpentAtCommerciantByUser(commerciant, user);
                     commerciantNode.put("total received", totalSpentAtCommerciant);
                 }
 

@@ -88,9 +88,12 @@ public class CashWithdrawal implements Command {
         // convert the amount to the account's currency, since we only withdraw RON
         double amountConverted = CurrencyConverter.convert("RON", account.getCurrency(),
                 amount);
-
+        Plan.PlanType userPlan = user.getPlanType();
+        if (account.getAccountType().equals(Account.AccountType.BUSINESS)) {
+            userPlan = account.getOwner().getPlanType();
+        }
         // take the commission depending on the user's plan
-        double commission = Plan.getCommission(user.getPlanType(), amountConverted,
+        double commission = Plan.getCommission(userPlan, amountConverted,
                 account.getCurrency());
 //        double commission;
 //        if (account.getAccountType().equals(Account.AccountType.BUSINESS)) {

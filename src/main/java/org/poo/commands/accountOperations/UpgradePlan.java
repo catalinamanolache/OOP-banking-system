@@ -110,8 +110,8 @@ public class UpgradePlan implements Command {
                 .newPlanType(newPlanTypeString)
                 .build();
         account.addTransaction(transaction);
-
-        System.out.println("user " + user.getEmail() + " upgraded from " + oldPlanType.name().toLowerCase()
-                + " to " + newPlanType.name().toLowerCase() + " paid " + fee + " RON" + " converted fee " + convertedFee + account.getCurrency() + " timestamp " + timestamp);
+//
+//        System.out.println("user " + user.getEmail() + " upgraded from " + oldPlanType.name().toLowerCase()
+//                + " to " + newPlanType.name().toLowerCase() + " paid " + fee + " RON" + " converted fee " + convertedFee + account.getCurrency() + " timestamp " + timestamp);
     }
 }

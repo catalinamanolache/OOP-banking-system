@@ -39,27 +39,9 @@ public class BusinessAccount extends Account {
                 INITIAL_BUSINESS_LIMIT);
     }
 
-    /**
-     * Handles the depositing and spending of money for the business account, checking if employees
-     * go over the spending limit or deposit limit.
-     * @param user the user that is depositing or spending money
-     * @param amount the amount of money that is being deposited or spent
-     * @param commerciant the commerciant where the money is being spent
-     * @return true if the transaction was successful, false otherwise
-     */
     @Override
-    public boolean handleMoneyTransactions(final User user, final double amount,
+    public void handleMoneyTransactions(final User user, final double amount,
                                            final Commerciant commerciant) {
-        // if the user is an employee, check if the amount exceeds the spending/depositing limit
-        if (this.userMap.get(UserType.EMPLOYEE).contains(user)) {
-            if (amount < 0 && -amount > this.spendingLimit) {
-                System.out.println("amount exceeds spending limit " + -amount + " the limit is " + this.spendingLimit);
-                return false;
-            } else if (amount > 0 && amount > this.depositLimit) {
-                System.out.println("amount exceeds deposit limit " + amount + " the limit is " + this.depositLimit);
-                return false;
-            }
-        }
 
         double localAmount = amount;
         // if the amount is negative, the user is spending money
@@ -106,7 +88,31 @@ public class BusinessAccount extends Account {
                 // create a new entry for the user and add the amount to it
                 this.totalDeposited.put(user, localAmount);
             }
-            System.out.println("deposited " + localAmount + " in business account");
+//            System.out.println("deposited " + localAmount + " in business account");
+        }
+    }
+
+    /**
+     * Handles the depositing and spending of money for the business account, checking if employees
+     * go over the spending limit or deposit limit.
+     * @param user the user that is depositing or spending money
+     * @param amount the amount of money that is being deposited or spent
+     * @param commerciant the commerciant where the money is being spent
+     * @return true if the transaction was successful, false otherwise
+     */
+    @Override
+    public boolean verifyMoneyTransaction(final User user, final double amount,
+                                          final Commerciant commerciant) {
+        System.out.println("user "+ user.getEmail() + " trying to pay or deposit " + amount + " role "+ getUserType(user) + " spending limit " +this.getSpendingLimit() + " deposit limit " + this.getDepositLimit());
+        // if the user is an employee, check if the amount exceeds the spending/depositing limit
+        if (this.userMap.get(UserType.EMPLOYEE).contains(user)) {
+            if (amount < 0 && -amount > this.spendingLimit) {
+                System.out.println("amount exceeds spending limit " + -amount + " the limit is " + this.spendingLimit);
+                return false;
+            } else if (amount > 0 && amount > this.depositLimit) {
+                System.out.println("amount exceeds deposit limit " + amount + " the limit is " + this.depositLimit);
+                return false;
+            }
         }
         return true;
     }
@@ -139,12 +145,23 @@ public class BusinessAccount extends Account {
         return true;
     }
 
+    @Override
+    public boolean handleDeleteCard(final Card card, final User user) {
+        if (!card.getOwner().equals(user) && this.userMap.get(UserType.EMPLOYEE).contains(user)) {
+            return false;
+        }
+        return true;
+    }
     /**
      * Adds a business associate to the business account in the corresponding list.
      * @param user the user to add
      * @param type the type of the user (manager or employee)
      */
     public void addBusinessAssociate(final User user, final UserType type) {
+        if (this.getOwner().equals(user) || this.userMap.get(UserType.MANAGER).contains(user)
+                || this.userMap.get(UserType.EMPLOYEE).contains(user)) {
+            return;
+        }
         List<User> users = this.userMap.get(type);
         users.add(user);
     }
