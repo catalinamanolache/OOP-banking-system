@@ -13,6 +13,11 @@ final class AgeCalculator {
     private AgeCalculator() {
     }
 
+    /**
+     * Compute the age of a user based on their birthdate.
+     * @param birthDateString the birthdate of the user
+     * @return the age of the user
+     */
     public static int computeAge(final String birthDateString) {
         LocalDate presentDate = LocalDate.now();
 
@@ -29,9 +34,9 @@ public final class User {
     private String email;
     private String birthDate;
     private String occupation;
+    private int age;
 
     private List<Account> accounts;
-    private int age;
     private Plan.PlanType planType;
 
     public User(final UserInput user) {
@@ -41,7 +46,11 @@ public final class User {
         this.birthDate = user.getBirthDate();
         this.occupation = user.getOccupation();
         this.accounts = new ArrayList<>();
+
+        // compute his age based on the current date
         this.age = AgeCalculator.computeAge(this.birthDate);
+
+        // for students, the starting plan is the student plan and for others, the standard plan
         if (this.occupation.equals("student")) {
             this.planType = Plan.PlanType.STUDENT;
         } else {

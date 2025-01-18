@@ -264,7 +264,7 @@ final class FormatTransactions {
 }
 
 public final class PrintTransactionsJSON {
-    private PrintTransactionsJSON(final Transaction transaction) {
+    private PrintTransactionsJSON() {
     }
 
     /**

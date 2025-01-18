@@ -1,7 +1,7 @@
 package org.poo.instances;
 
 import org.poo.accounts.Account;
-import org.poo.bankManager.CurrencyConverter;
+import org.poo.bankmanager.CurrencyConverter;
 import org.poo.transactions.Transaction;
 
 import static org.poo.instances.Constants.SILVER_THRESHOLD;
@@ -71,7 +71,8 @@ public final class Plan {
      * @param newPlan the new plan the user wants to upgrade to
      * @return true if the user tries to downgrade, false otherwise
      */
-    public static boolean checkIfDowngrade(Plan.PlanType currentPlan, Plan.PlanType newPlan) {
+    public static boolean checkIfDowngrade(final Plan.PlanType currentPlan,
+                                           final Plan.PlanType newPlan) {
         if (currentPlan.equals(PlanType.STANDARD) && newPlan.equals(PlanType.STUDENT)) {
             return false;
         } else if (currentPlan.equals(PlanType.STUDENT) && newPlan.equals(PlanType.STANDARD)) {
@@ -99,15 +100,14 @@ public final class Plan {
         for (Account userAccount : user.getAccounts()) {
             for (Transaction transaction : userAccount.getTransactions()) {
                 if (transaction.getTransactionType().equals("payOnline")
-                        || (transaction.getTransactionType().equals("sendMoney")
-                        && transaction.getCommerciant() != null)) {
+                        || transaction.getTransactionType().equals("sendMoney")) {
                     double amount = transaction.getAmount();
                     double amountConverted = CurrencyConverter.convert(userAccount.getCurrency(),
                             "RON", amount);
 
+                    // if the amount is greater than the threshold in RON, increment the counter
                     if (amountConverted >= AUTO_UPGRADE_THRESHOLD) {
                         validTransactionsCount++;
-                        System.out.println("transaction " + transaction.getTimestamp() + " " + transaction.getAmount() + " " + transaction.getCommerciant());
                     }
 
                     // if the user has at least 5 transactions greater than 300 RON, he can upgrade

@@ -1,7 +1,6 @@
 package org.poo.accounts;
 
-import org.poo.bankManager.CurrencyConverter;
-import org.poo.cards.Card;
+import org.poo.bankmanager.CurrencyConverter;
 import org.poo.instances.Commerciant;
 import org.poo.instances.User;
 
@@ -17,9 +16,16 @@ public class BusinessAccount extends Account {
         MANAGER, EMPLOYEE
     }
 
+    // a map of the list of users associated with the business account, organized by their type
     private Map<UserType, List<User>> userMap;
+
+    // a map of the total amount spent at each commerciant by each user
     private Map<User, Map<Commerciant, Double>> totalSpentBusiness;
+
+    // a map of the number of transactions made at each commerciant by each user
     private Map<User, Map<Commerciant, Integer>> nrOfTransactionsBusiness;
+
+    // a map of the total amount deposited by each user
     private Map<User, Double> totalDeposited;
 
     private double spendingLimit;
@@ -33,12 +39,21 @@ public class BusinessAccount extends Account {
         this.totalSpentBusiness = new HashMap<>();
         this.totalDeposited = new HashMap<>();
         this.nrOfTransactionsBusiness = new HashMap<>();
+
+        // convert the initial limits to the currency of the account
         this.spendingLimit = CurrencyConverter.convert("RON", currency,
                 INITIAL_BUSINESS_LIMIT);
         this.depositLimit = CurrencyConverter.convert("RON", currency,
                 INITIAL_BUSINESS_LIMIT);
     }
 
+    /**
+     * Handles the depositing and spending of money for the business account, updating the total
+     * deposited and spent amounts for each user.
+     * @param user the user that is depositing or spending money
+     * @param amount the amount of money that is being deposited or spent
+     * @param commerciant the commerciant where the money is being spent
+     */
     @Override
     public void handleMoneyTransactions(final User user, final double amount,
                                            final Commerciant commerciant) {
@@ -68,7 +83,6 @@ public class BusinessAccount extends Account {
                 } else {
                     nrOfTransactionsMap.put(commerciant, 1);
                 }
-                System.out.println("spent " + localAmount + " in business account");
             } else {
                 // create a new map for the user and add the amount to it
                 Map<Commerciant, Double> spentMap = new HashMap<>();
@@ -78,7 +92,6 @@ public class BusinessAccount extends Account {
                 Map<Commerciant, Integer> nrOfTransactionsMap = new HashMap<>();
                 nrOfTransactionsMap.put(commerciant, 1);
                 this.nrOfTransactionsBusiness.put(user, nrOfTransactionsMap);
-                System.out.println("spent " + localAmount + " in business account");
             }
         } else {
             // add the amount to the total deposited of the user, if the user has already deposited
@@ -88,32 +101,28 @@ public class BusinessAccount extends Account {
                 // create a new entry for the user and add the amount to it
                 this.totalDeposited.put(user, localAmount);
             }
-//            System.out.println("deposited " + localAmount + " in business account");
         }
     }
 
     /**
-     * Handles the depositing and spending of money for the business account, checking if employees
-     * go over the spending limit or deposit limit.
-     * @param user the user that is depositing or spending money
-     * @param amount the amount of money that is being deposited or spent
-     * @param commerciant the commerciant where the money is being spent
-     * @return true if the transaction was successful, false otherwise
+     * Verifies if the user can make the transaction, checking if the amount exceeds the spending
+     * or depositing limit of the user, only for employees.
+     * @param user the user making the transaction
+     * @param amount the amount of the transaction
+     * @return true if the user can make the transaction, false otherwise
      */
     @Override
-    public boolean verifyMoneyTransaction(final User user, final double amount,
-                                          final Commerciant commerciant) {
-        System.out.println("user "+ user.getEmail() + " trying to pay or deposit " + amount + " role "+ getUserType(user) + " spending limit " +this.getSpendingLimit() + " deposit limit " + this.getDepositLimit());
+    public boolean verifyTransaction(final User user, final double amount) {
         // if the user is an employee, check if the amount exceeds the spending/depositing limit
         if (this.userMap.get(UserType.EMPLOYEE).contains(user)) {
             if (amount < 0 && -amount > this.spendingLimit) {
-                System.out.println("amount exceeds spending limit " + -amount + " the limit is " + this.spendingLimit);
                 return false;
             } else if (amount > 0 && amount > this.depositLimit) {
-                System.out.println("amount exceeds deposit limit " + amount + " the limit is " + this.depositLimit);
                 return false;
             }
         }
+
+        // for other users, the transaction is always possible (they don't have a limit)
         return true;
     }
 
@@ -130,38 +139,18 @@ public class BusinessAccount extends Account {
     }
 
     /**
-     * Handles the card transactions for the business account, checking if the employee
-     * is the owner of the card.
-     * @param card the card that is being used
-     * @param user the user that is using the card
-     * @return true if the transaction was successful, false otherwise
-     */
-    @Override
-    public boolean handleCardTransactions(final Card card, final User user) {
-        if (this.userMap.get(UserType.EMPLOYEE).contains(user) && !card.getOwner().equals(user)) {
-            System.out.println("employee is not the owner of the card");
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean handleDeleteCard(final Card card, final User user) {
-        if (!card.getOwner().equals(user) && this.userMap.get(UserType.EMPLOYEE).contains(user)) {
-            return false;
-        }
-        return true;
-    }
-    /**
      * Adds a business associate to the business account in the corresponding list.
      * @param user the user to add
      * @param type the type of the user (manager or employee)
      */
     public void addBusinessAssociate(final User user, final UserType type) {
+        // if the user is already associated with the business account, don't add it again
         if (this.getOwner().equals(user) || this.userMap.get(UserType.MANAGER).contains(user)
                 || this.userMap.get(UserType.EMPLOYEE).contains(user)) {
             return;
         }
+
+        // add the user to the corresponding list
         List<User> users = this.userMap.get(type);
         users.add(user);
     }
@@ -193,21 +182,6 @@ public class BusinessAccount extends Account {
 
         for (Map.Entry<Commerciant, Double> entry : spentMap.entrySet()) {
             totalSpent += entry.getValue();
-        }
-        return totalSpent;
-    }
-
-    /**
-     * Gets the total amount of money spent at a commerciant.
-     * @param commerciant the commerciant to get the total spent amount for
-     * @return the total amount of money spent at the commerciant
-     */
-    public double getTotalSpentAtCommerciant(final Commerciant commerciant) {
-        double totalSpent = 0;
-        for (Map.Entry<User, Map<Commerciant, Double>> map : this.totalSpentBusiness.entrySet()) {
-            if (map.getValue().containsKey(commerciant)) {
-                totalSpent += map.getValue().get(commerciant);
-            }
         }
         return totalSpent;
     }
@@ -361,11 +335,23 @@ public class BusinessAccount extends Account {
         this.totalDeposited = totalDeposited;
     }
 
+    /**
+     * Gets the number of transactions made at each commerciant for each user of the business
+     * account.
+     * @return the number of transactions made at each commerciant for each user of the business
+     * account
+     */
     public Map<User, Map<Commerciant, Integer>> getNrOfTransactionsBusiness() {
         return nrOfTransactionsBusiness;
     }
 
-    public void setNrOfTransactionsBusiness(Map<User, Map<Commerciant, Integer>> nrOfTransactionsBusiness) {
-        this.nrOfTransactionsBusiness = nrOfTransactionsBusiness;
+    /**
+     * Sets the number of transactions made at each commerciant for each user of the business
+     * account.
+     * @param map the number of transactions made at each commerciant for each
+     *                                 user of the business account
+     */
+    public void setNrOfTransactionsBusiness(final Map<User, Map<Commerciant, Integer>> map) {
+        this.nrOfTransactionsBusiness = map;
     }
 }

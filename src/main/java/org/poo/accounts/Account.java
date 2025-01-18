@@ -1,5 +1,5 @@
 package org.poo.accounts;
-import org.poo.bankManager.CurrencyConverter;
+import org.poo.bankmanager.CurrencyConverter;
 import org.poo.cards.Card;
 import org.poo.instances.Commerciant;
 import org.poo.instances.User;
@@ -26,11 +26,17 @@ public abstract class Account {
     private List<Card> cards;
     private List<Transaction> transactions;
 
+    // a map of the total amount spent at each commerciant
     private Map<Commerciant, Double> totalSpent;
+
+    // a map of the number of transactions made at each commerciant
     private Map<Commerciant, Integer> nrOfTransactions;
+
+    // a map of the nrOfTransactions cashback received at each commerciant type
     private Map<Commerciant.CommerciantType, Double> nrOfTransactionsCashback;
+
+    // a map of the spendingThreshold cashback received at each commerciant
     private Map<Commerciant, Double> spendingThresholdCashback;
-    private double spendingThresholdTotal;
 
     public Account(final String currency, final AccountType accountType, final User owner) {
         this.balance = 0;
@@ -45,37 +51,26 @@ public abstract class Account {
         this.nrOfTransactions = new HashMap<>();
         this.nrOfTransactionsCashback = new HashMap<>();
         this.spendingThresholdCashback = new HashMap<>();
-        this.spendingThresholdTotal = 0;
     }
 
     /**
      * Handle money transactions between the user and a commerciant.
      * @param user the user making the transaction
      * @param amount the amount of the transaction
-     * @param commerciant the commerciant receiving the transaction
      * @return true if the transaction was successful, false otherwise
      */
-    public boolean verifyMoneyTransaction(final User user, final double amount,
-                                          final Commerciant commerciant) {
+    public boolean verifyTransaction(final User user, final double amount) {
         return true;
     }
-
-    public void handleMoneyTransactions(final User user, final double amount,
-                                        final Commerciant commerciant) {}
-
 
     /**
-     * Handle card transactions between the user and a card.
-     * @param card the card used for the transaction
+     * Handle money transactions between the user and a commerciant.
      * @param user the user making the transaction
-     * @return true if the transaction was successful, false otherwise
+     * @param amount the amount of the transaction
+     * @param commerciant the commerciant at which the transaction is made
      */
-    public boolean handleCardTransactions(final Card card, final User user) {
-        return true;
-    }
-
-    public boolean handleDeleteCard(final Card card, final User user) {
-        return true;
+    public void handleMoneyTransactions(final User user, final double amount,
+                                        final Commerciant commerciant) {
     }
 
     /**
@@ -92,7 +87,6 @@ public abstract class Account {
         } else {
             this.totalSpent.put(commerciant, amountConverted);
         }
-//        System.out.println("total spent " + this.totalSpent.get(commerciant));
     }
 
     /**
@@ -330,13 +324,5 @@ public abstract class Account {
      */
     public void setSpendingThresholdCashback(final Map<Commerciant, Double> map) {
         this.spendingThresholdCashback = map;
-    }
-
-    public double getSpendingThresholdTotal() {
-        return spendingThresholdTotal;
-    }
-
-    public void setSpendingThresholdTotal(double spendingThresholdTotal) {
-        this.spendingThresholdTotal = spendingThresholdTotal;
     }
 }
