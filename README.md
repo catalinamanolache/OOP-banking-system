@@ -1,6 +1,4 @@
-# J. POO Morgan Chase & Co. - Stage 2
-
-### Name: Manolache Maria-Catalina, Group: 323CA
+# J. POO Morgan Chase & Co. - OOP Banking System
 
 ## Description
 - Implemented a simplified banking system that allows users to create accounts,
